@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container dashboard-container">
+    <!-- TOP HEADER BAR -->
+    <div class="dashboard-topbar">
+        <div>
+            <h1 class="dashboard-title">Admin Dashboard</h1>
+            <p class="dashboard-subtitle">Monitor loan approvals, flagged risks, and recent application activity.</p>
+        </div>
+
+        <a href="{{ url_for('predict.application') }}" class="action-btn">+ Run New Prediction</a>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats dashboard-stats compact-stats">
+        <div class="stat-card compact-card">
+            <h3>Total Applications</h3>
+            <p>{{ stats.total }}</p>
+        </div>
+
+        <div class="stat-card compact-card">
+            <h3>Approved</h3>
+            <p>{{ stats.approved }}</p>
+        </div>
+
+        <div class="stat-card compact-card">
+            <h3>Rejected</h3>
+            <p>{{ stats.rejected }}</p>
+        </div>
+
+        <div class="stat-card compact-card">
+            <h3>High Risk</h3>
+            <p>{{ stats.high_risk }}</p>
+        </div>
+    </div>
+
+    <!-- ANALYTICS PANELS -->
+    <div class="dashboard-grid compact-grid">
+        <div class="dashboard-panel compact-panel">
+            <h3>Common Rejection Reasons</h3>
+            <ul class="reason-list dashboard-list">
+                {% for reason in rejection_reasons %}
+                <li>{{ reason }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="dashboard-panel compact-panel">
+            <h3>System Insights</h3>
+            <ul class="reason-list dashboard-list">
+                <li>Credit score and repayment capacity are the strongest decision drivers.</li>
+                <li>High-risk applications should be routed for manual underwriting review.</li>
+                <li>Borderline applications may benefit from co-applicant support.</li>
+                <li>Explainable AI recommendations improve transparency in lending decisions.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- RECENT APPLICATIONS -->
+    <div class="dashboard-panel compact-panel table-panel">
+        <div class="table-header">
+            <h3>Recent Applications</h3>
+            <span class="table-meta">Latest processed loan cases</span>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="app-table compact-table">
+                <thead>
+                    <tr>
+                        <th>Applicant Name</th>
+                        <th>Status</th>
+                        <th>Risk Level</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in recent_applications %}
+                    <tr>
+                        <td>{{ app.name }}</td>
+                        <td>
+                            <span
+                                class="status-badge {% if app.status == 'Approved' %}status-approved{% else %}status-rejected{% endif %}">
+                                {{ app.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="risk-badge 
+            {% if app.risk == 'Low' %}
+                risk-low
+            {% elif app.risk == 'Medium' %}
+                risk-medium
+            {% else %}
+                risk-high
+            {% endif %}">
+                                {{ app.risk }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('dashboard.review') }}" class="table-review-btn">Review</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

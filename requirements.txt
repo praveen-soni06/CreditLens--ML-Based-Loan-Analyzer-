@@ -1,0 +1,7 @@
+Flask
+python-dotenv
+xgboost
+scikit-learn
+pandas
+numpy
+imbalanced-learn

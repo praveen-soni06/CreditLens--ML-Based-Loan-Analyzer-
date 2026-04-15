@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Loan Eligibility Check{% endblock %}
+
+{% block content %}
+<div class="container form-container">
+    <h1>AI-Powered Loan Eligibility Analyzer</h1>
+    <p class="subtitle">Complete the form below to check your loan eligibility instantly with explainable AI insights.</p>
+
+    <form action="{{ url_for('predict.predict') }}" method="POST" class="loan-form">
+
+        <!-- PERSONAL INFORMATION -->
+        <div class="form-section">
+            <h2 class="section-title">Personal Information</h2>
+
+            <div class="form-grid two-col">
+                <div class="form-group">
+                    <label>Full Name <span class="required-badge">Required</span></label>
+                    <input type="text" name="full_name" placeholder="e.g. Rahul Sharma" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender <span class="required-badge">Required</span></label>
+                    <select name="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-grid three-col">
+                <div class="form-group">
+                    <label>Marital Status <span class="required-badge">Required</span></label>
+                    <select name="marital_status" required>
+                        <option value="">Select Status</option>
+                        <option value="single">Single</option>
+                        <option value="married">Married</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Dependents <span class="required-badge">Required</span></label>
+                    <select name="dependents" required>
+                        <option value="">Select</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3+">3+</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Education <span class="required-badge">Required</span></label>
+                    <select name="education" required>
+                        <option value="">Select Education</option>
+                        <option value="graduate">Graduate</option>
+                        <option value="not_graduate">Not Graduate</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- FINANCIAL DETAILS -->
+        <div class="form-section">
+            <h2 class="section-title">Financial Details</h2>
+
+            <div class="form-grid two-col">
+                <div class="form-group">
+                    <label>Applicant Income (₹/month) <span class="required-badge">Required</span></label>
+                    <input type="number" name="income" placeholder="e.g. 50000" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Co-applicant Income (₹/month) <span class="optional-badge">Optional</span></label>
+                    <input type="number" name="coapp_income" placeholder="e.g. 20000">
+                </div>
+            </div>
+
+            <div class="form-grid three-col">
+                <div class="form-group">
+                    <label>Employment Type <span class="required-badge">Required</span></label>
+                    <select name="employment_type" required>
+                        <option value="">Select Employment</option>
+                        <option value="salaried">Salaried</option>
+                        <option value="self_employed">Self Employed</option>
+                        <option value="business">Business</option>
+                        <option value="freelancer">Freelancer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Credit History <span class="required-badge">Required</span></label>
+                    <select name="credit_history" required>
+                        <option value="">Select Credit History</option>
+                        <option value="1">Good (1)</option>
+                        <option value="0">Bad / No History (0)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Credit Score <span class="required-badge">Required</span></label>
+                    <input type="number" name="credit_score" placeholder="e.g. 720" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOAN DETAILS -->
+        <div class="form-section">
+            <h2 class="section-title">Loan Details</h2>
+
+            <div class="form-grid three-col">
+                <div class="form-group">
+                    <label>Loan Amount (₹) <span class="required-badge">Required</span></label>
+                    <input type="number" name="loan_amount" placeholder="e.g. 200000" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Loan Term (months) <span class="required-badge">Required</span></label>
+                    <select name="loan_term" required>
+                        <option value="">Select Term</option>
+                        <option value="120">120</option>
+                        <option value="180">180</option>
+                        <option value="240">240</option>
+                        <option value="300">300</option>
+                        <option value="360">360</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Property Area <span class="required-badge">Required</span></label>
+                    <select name="property_area" required>
+                        <option value="">Select Area</option>
+                        <option value="urban">Urban</option>
+                        <option value="semiurban">Semiurban</option>
+                        <option value="rural">Rural</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-grid one-col">
+                <div class="form-group">
+                    <label>Loan Purpose / Intent <span class="required-badge">Required</span></label>
+                    <select name="loan_intent" required>
+                        <option value="">Select Purpose</option>
+                        <option value="personal">Personal</option>
+                        <option value="education">Education</option>
+                        <option value="medical">Medical</option>
+                        <option value="venture">Business / Venture</option>
+                        <option value="homeimprovement">Home Improvement</option>
+                        <option value="debtconsolidation">Debt Consolidation</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- REASON FOR LOAN -->
+        <div class="form-section">
+            <h2 class="section-title">
+                Reason for Loan
+                <span class="nlp-badge">AI / NLP Feature</span>
+            </h2>
+
+            <div class="form-grid one-col">
+                <div class="form-group">
+                    <label>Describe why you need this loan <span class="optional-badge">Optional</span></label>
+                    <textarea name="loan_reason" rows="4" placeholder="e.g. I need this loan to purchase a new home for my family in Bhopal. I have stable employment and can repay on time."></textarea>
+                    <small class="helper-text">This text can be analyzed later for explainable AI insights and loan intent understanding.</small>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Check Eligibility</button>
+    </form>
+</div>
+{% endblock %}
