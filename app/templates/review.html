@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Application Review{% endblock %}
+
+{% block content %}
+<div class="container review-container">
+    <!-- TOP HEADER -->
+    <div class="review-topbar">
+        <div>
+            <h1 class="review-title">Application Review</h1>
+            <p class="review-subtitle">AI recommendation with human-in-the-loop underwriting review</p>
+        </div>
+
+        <a href="{{ url_for('predict.application') }}" class="action-btn">+ New Application</a>
+    </div>
+
+    <!-- AI RECOMMENDATION CARD -->
+    <div class="review-summary-card {% if review.recommendation == 'Approved' %}approved-card{% else %}rejected-card{% endif %}">
+        <div class="review-summary-header">
+            <div>
+                <h2>{{ review.applicant_name }}</h2>
+                <p class="review-summary-subtext">
+                    AI Recommendation: <strong>{{ review.recommendation }}</strong>
+                </p>
+            </div>
+
+            <div class="review-badges">
+                <span class="risk-badge 
+                    {% if review.risk_level == 'Low' %}
+                        risk-low
+                    {% elif review.risk_level == 'Medium' %}
+                        risk-medium
+                    {% else %}
+                        risk-high
+                    {% endif %}">
+                    Risk: {{ review.risk_level }}
+                </span>
+
+                <span class="confidence-badge">
+                    Confidence: {{ review.confidence }}%
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPLICANT DETAILS -->
+    <div class="review-grid">
+        <div class="review-panel">
+            <h3>Applicant Summary</h3>
+
+            <div class="review-info-grid">
+                <div class="info-item">
+                    <span class="info-label">Applicant Income</span>
+                    <span class="info-value">{{ review.income }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Co-applicant Income</span>
+                    <span class="info-value">{{ review.coapp_income }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Loan Amount</span>
+                    <span class="info-value">{{ review.loan_amount }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Loan Term</span>
+                    <span class="info-value">{{ review.loan_term }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Credit Score</span>
+                    <span class="info-value">{{ review.credit_score }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Loan Purpose</span>
+                    <span class="info-value">{{ review.loan_intent }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="review-panel">
+            <h3>AI Decision Factors</h3>
+            <ul class="reason-list dashboard-list">
+                {% for reason in review.reasons %}
+                    <li>{{ reason }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- UNDERWRITER ACTIONS -->
+    <div class="review-panel action-panel">
+        <h3>Underwriter Actions</h3>
+        <p class="review-helper-text">
+            Final decision remains with the banker. Use AI recommendation as decision support, not as the sole authority.
+        </p>
+
+        <div class="underwriter-actions">
+            <button class="decision-btn approve-btn">Approve Loan</button>
+            <button class="decision-btn reject-btn">Reject Loan</button>
+            <button class="decision-btn review-btn">Send for Manual Review</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

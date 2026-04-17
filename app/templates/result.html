@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Loan Decision Result{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Loan Eligibility Assessment</h1>
+    <p class="subtitle">AI-assisted decision summary for <strong>{{ applicant_name }}</strong></p>
+
+    <div class="decision-card {% if result == 'Approved' %}approved-card{% else %}rejected-card{% endif %}">
+        <div class="decision-header">
+            <div>
+                <h2>Decision: {{ result }}</h2>
+                <p class="decision-subtext">
+                    {% if result == "Approved" %}
+                        Your application meets the current eligibility criteria.
+                    {% else %}
+                        Your application currently falls below the preferred eligibility criteria.
+                    {% endif %}
+                </p>
+            </div>
+
+            <div class="risk-badge 
+                {% if risk_level == 'Low' %}
+                    risk-low
+                {% elif risk_level == 'Medium' %}
+                    risk-medium
+                {% else %}
+                    risk-high
+                {% endif %}">
+                Risk: {{ risk_level }}
+            </div>
+        </div>
+    </div>
+
+    <div class="result-sections">
+        <div class="result-panel">
+            <h3>Why this decision?</h3>
+            <ul class="reason-list">
+                {% for reason in reasons %}
+                    <li>{{ reason }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="result-panel">
+            <h3>Suggested Improvements</h3>
+            <ul class="reason-list">
+                {% for suggestion in suggestions %}
+                    <li>{{ suggestion }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+   <div class="result-actions">
+    <a href="{{ url_for('dashboard.review') }}" class="action-link-btn primary-action">Review Application</a>
+    <a href="{{ url_for('dashboard.dashboard') }}" class="action-link-btn secondary-action">Go to Dashboard</a>
+    <a href="{{ url_for('predict.application') }}" class="action-link-btn neutral-action">New Application</a>
+</div>
+{% endblock %}
