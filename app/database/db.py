@@ -19,8 +19,8 @@ class User(db.Model):
     default='loan_assistant')
     created_at = db.Column(db.DateTime, nullable = False, default=datetime.utcnow)
 
-    applications = db.relationship('Application', foreign_keys='Application.loan_assistant_id', backref='loan_assistant', lazy=True)
-    decisions = db.relationship('Prediction', foreign_keys='Prediction.decided_by', backref='credit_manager', lazy=True)
+    loan_applications = db.relationship('Application', foreign_keys='Application.loan_assistant_id', backref='loan_assistant', lazy=True)
+    decision_history = db.relationship('Prediction', foreign_keys='Prediction.decided_by', backref='credit_manager', lazy=True)
 
 class Application(db.Model):
     __tablename__ = 'applications'
@@ -44,7 +44,7 @@ class Application(db.Model):
     previous_loan_defaults_on_file = db.Column(db.SmallInteger, nullable=False)
     submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    prediction = db.relationship('Prediction', backref='application', lazy=True, uselist=False)
+    prediction = db.relationship('Prediction', backref='application', uselist=False)
 
 
 class Prediction(db.Model):
