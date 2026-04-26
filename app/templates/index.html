@@ -1,176 +1,260 @@
 {% extends "base.html" %}
 
-{% block title %}Loan Eligibility Check{% endblock %}
+{% block title %}Loan Application | CreditLens{% endblock %}
 
 {% block content %}
-<div class="container form-container">
-    <h1>AI-Powered Loan Eligibility Analyzer</h1>
-    <p class="subtitle">Complete the form below to check your loan eligibility instantly with explainable AI insights.</p>
-
-    <form action="{{ url_for('predict.predict') }}" method="POST" class="loan-form">
-
-        <!-- PERSONAL INFORMATION -->
-        <div class="form-section">
-            <h2 class="section-title">Personal Information</h2>
-
-            <div class="form-grid two-col">
-                <div class="form-group">
-                    <label>Full Name <span class="required-badge">Required</span></label>
-                    <input type="text" name="full_name" placeholder="e.g. Rahul Sharma" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Gender <span class="required-badge">Required</span></label>
-                    <select name="gender" required>
-                        <option value="">Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-grid three-col">
-                <div class="form-group">
-                    <label>Marital Status <span class="required-badge">Required</span></label>
-                    <select name="marital_status" required>
-                        <option value="">Select Status</option>
-                        <option value="single">Single</option>
-                        <option value="married">Married</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Dependents <span class="required-badge">Required</span></label>
-                    <select name="dependents" required>
-                        <option value="">Select</option>
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3+">3+</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Education <span class="required-badge">Required</span></label>
-                    <select name="education" required>
-                        <option value="">Select Education</option>
-                        <option value="graduate">Graduate</option>
-                        <option value="not_graduate">Not Graduate</option>
-                    </select>
-                </div>
+<div class="application-wrapper">
+    <div class="application-topbar">
+        <div class="portal-title">
+            <span class="portal-icon">🏦</span>
+            <div>
+                <h2>CreditLens — Credit Underwriting Portal</h2>
+                <p>Loan application intake for ML-based credit decisioning</p>
             </div>
         </div>
 
-        <!-- FINANCIAL DETAILS -->
-        <div class="form-section">
-            <h2 class="section-title">Financial Details</h2>
-
-            <div class="form-grid two-col">
-                <div class="form-group">
-                    <label>Applicant Income (₹/month) <span class="required-badge">Required</span></label>
-                    <input type="number" name="income" placeholder="e.g. 50000" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Co-applicant Income (₹/month) <span class="optional-badge">Optional</span></label>
-                    <input type="number" name="coapp_income" placeholder="e.g. 20000">
-                </div>
+        <div class="user-meta">
+            <div class="user-avatar">CL</div>
+            <div>
+                <strong>{{ session.get('user_name', 'Loan Officer') }}</strong>
+                <p>{{ session.get('role', 'loan_assistant')|replace('_', ' ')|title }}</p>
             </div>
+        </div>
+    </div>
 
-            <div class="form-grid three-col">
-                <div class="form-group">
-                    <label>Employment Type <span class="required-badge">Required</span></label>
-                    <select name="employment_type" required>
-                        <option value="">Select Employment</option>
-                        <option value="salaried">Salaried</option>
-                        <option value="self_employed">Self Employed</option>
-                        <option value="business">Business</option>
-                        <option value="freelancer">Freelancer</option>
-                    </select>
+    <div class="progress-strip">
+        <div class="progress-step active" id="progress-1">1. Customer Info</div>
+        <div class="progress-step" id="progress-2">2. Loan Application</div>
+        <div class="progress-step" id="progress-3">3. Review & Submit</div>
+        <div class="progress-step" id="progress-4">4. ML Prediction</div>
+    </div>
+
+    <div class="application-meta">
+        <span><strong>Application Ref:</strong> {{ application_ref }}</span>
+        <span><strong>Date:</strong> {{ current_date }}</span>
+    </div>
+
+    <form method="POST" action="{{ url_for('predict.predict') }}" class="loan-form-card" id="loanApplicationForm">
+
+        <!-- STEP 1 -->
+        <div class="form-step active-step" id="step-1">
+
+            <!-- PERSONAL DETAILS -->
+            <section class="form-section">
+                <div class="section-header">
+                    <h3>👤 Personal Details</h3>
+                    <p>Basic customer information</p>
                 </div>
 
-                <div class="form-group">
-                    <label>Credit History <span class="required-badge">Required</span></label>
-                    <select name="credit_history" required>
-                        <option value="">Select Credit History</option>
-                        <option value="1">Good (1)</option>
-                        <option value="0">Bad / No History (0)</option>
-                    </select>
+                <div class="form-grid two-col">
+                    <div class="form-group">
+                        <label>Customer Full Name <span class="required">*</span></label>
+                        <input type="text" name="customer_name" placeholder="e.g. Amit Kumar" required>
+                        <small>As per government ID</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Customer Email <span class="required">*</span></label>
+                        <input type="email" name="customer_email" placeholder="e.g. amit@email.com" required>
+                        <small>Result notification will be sent here</small>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Credit Score <span class="required-badge">Required</span></label>
-                    <input type="number" name="credit_score" placeholder="e.g. 720" required>
+                <div class="form-grid three-col">
+                    <div class="form-group">
+                        <label>Age <span class="required">*</span></label>
+                        <input type="number" name="person_age" placeholder="e.g. 28" min="18" max="80" required>
+                        <small>person_age</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gender <span class="required">*</span></label>
+                        <select name="person_gender" required>
+                            <option value="">Select</option>
+                            <option value="1">Male</option>
+                            <option value="0">Female</option>
+                        </select>
+                        <small>person_gender</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Education <span class="required">*</span></label>
+                        <select name="person_education" required>
+                            <option value="">Select</option>
+                            <option value="High School">High School</option>
+                            <option value="Associate">Associate</option>
+                            <option value="Bachelor">Bachelor</option>
+                            <option value="Master">Master</option>
+                            <option value="Doctorate">Doctorate</option>
+                        </select>
+                        <small>person_education</small>
+                    </div>
                 </div>
+            </section>
+
+            <div class="form-actions">
+                <a href="{{ url_for('dashboard.dashboard') }}" class="secondary-btn">Cancel</a>
+                <button type="button" class="primary-btn" id="next-step-1">Next →</button>
             </div>
         </div>
 
-        <!-- LOAN DETAILS -->
-        <div class="form-section">
-            <h2 class="section-title">Loan Details</h2>
+        <!-- STEP 2 -->
+        <div class="form-step" id="step-2">
 
-            <div class="form-grid three-col">
-                <div class="form-group">
-                    <label>Loan Amount (₹) <span class="required-badge">Required</span></label>
-                    <input type="number" name="loan_amount" placeholder="e.g. 200000" required>
+            <!-- FINANCIAL DETAILS -->
+            <section class="form-section">
+                <div class="section-header">
+                    <h3>💼 Financial Details</h3>
+                    <p>Income and employment information</p>
                 </div>
 
-                <div class="form-group">
-                    <label>Loan Term (months) <span class="required-badge">Required</span></label>
-                    <select name="loan_term" required>
-                        <option value="">Select Term</option>
-                        <option value="120">120</option>
-                        <option value="180">180</option>
-                        <option value="240">240</option>
-                        <option value="300">300</option>
-                        <option value="360">360</option>
-                    </select>
+                <div class="form-grid three-col">
+                    <div class="form-group">
+                        <label>Annual Income (₹) <span class="required">*</span></label>
+                        <input type="number" name="person_income" placeholder="e.g. 600000" min="0" step="0.01" required>
+                        <small>person_income</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Employment Experience (Years) <span class="required">*</span></label>
+                        <input type="number" name="person_emp_exp" placeholder="e.g. 3" min="0" step="1" required>
+                        <small>person_emp_exp</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Home Ownership <span class="required">*</span></label>
+                        <select name="person_home_ownership" required>
+                            <option value="">Select</option>
+                            <option value="RENT">Rent</option>
+                            <option value="OWN">Own</option>
+                            <option value="MORTGAGE">Mortgage</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                        <small>person_home_ownership</small>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CREDIT INFORMATION -->
+            <section class="form-section">
+                <div class="section-header">
+                    <h3>⭐ Credit Information</h3>
+                    <p>Credit bureau data</p>
                 </div>
 
-                <div class="form-group">
-                    <label>Property Area <span class="required-badge">Required</span></label>
-                    <select name="property_area" required>
-                        <option value="">Select Area</option>
-                        <option value="urban">Urban</option>
-                        <option value="semiurban">Semiurban</option>
-                        <option value="rural">Rural</option>
-                    </select>
-                </div>
-            </div>
+                <div class="form-grid three-col">
+                    <div class="form-group">
+                        <label>Credit Score <span class="required">*</span></label>
+                        <input type="number" name="credit_score" placeholder="e.g. 680" min="300" max="900" required>
+                        <small>credit_score (300–900)</small>
+                    </div>
 
-            <div class="form-grid one-col">
-                <div class="form-group">
-                    <label>Loan Purpose / Intent <span class="required-badge">Required</span></label>
-                    <select name="loan_intent" required>
-                        <option value="">Select Purpose</option>
-                        <option value="personal">Personal</option>
-                        <option value="education">Education</option>
-                        <option value="medical">Medical</option>
-                        <option value="venture">Business / Venture</option>
-                        <option value="homeimprovement">Home Improvement</option>
-                        <option value="debtconsolidation">Debt Consolidation</option>
-                    </select>
+                    <div class="form-group">
+                        <label>Credit History Length <span class="required">*</span></label>
+                        <input type="number" name="credit_history_length" placeholder="e.g. 4" min="0" step="0.1" required>
+                        <small>credit_history_length (years)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Previous Loan Defaults <span class="required">*</span></label>
+                        <select name="previous_loan_defaults_on_file" required>
+                            <option value="">Select</option>
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                        <small>previous_loan_defaults_on_file</small>
+                    </div>
                 </div>
+            </section>
+
+            <!-- LOAN DETAILS -->
+            <section class="form-section">
+                <div class="section-header">
+                    <h3>💳 Loan Details</h3>
+                    <p>Loan amount and purpose</p>
+                </div>
+
+                <div class="form-grid three-col">
+                    <div class="form-group">
+                        <label>Loan Amount (₹) <span class="required">*</span></label>
+                        <input type="number" name="loan_amnt" placeholder="e.g. 200000" min="0" step="0.01" required>
+                        <small>loan_amnt</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Interest Rate (%) <span class="required">*</span></label>
+                        <input type="number" name="loan_int_rate" placeholder="e.g. 10.5" min="0" step="0.01" required>
+                        <small>loan_int_rate</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Loan Intent <span class="required">*</span></label>
+                        <select name="loan_intent" required>
+                            <option value="">Select</option>
+                            <option value="PERSONAL">Personal</option>
+                            <option value="EDUCATION">Education</option>
+                            <option value="MEDICAL">Medical</option>
+                            <option value="HOMEIMPROVEMENT">Home Improvement</option>
+                            <option value="VENTURE">Business / Venture</option>
+                            <option value="DEBTCONSOLIDATION">Debt Consolidation</option>
+                        </select>
+                        <small>loan_intent</small>
+                    </div>
+                </div>
+
+                <div class="auto-note">
+                    <strong>Auto:</strong> Flask will calculate <code>loan_percent_income</code> =
+                    <code>loan_amnt ÷ person_income</code>
+                </div>
+            </section>
+
+            <div class="form-actions">
+                <button type="button" class="secondary-btn" id="back-step-2">← Back</button>
+                <button type="button" class="primary-btn" id="next-step-2">Next →</button>
             </div>
         </div>
 
-        <!-- REASON FOR LOAN -->
-        <div class="form-section">
-            <h2 class="section-title">
-                Reason for Loan
-                <span class="nlp-badge">AI / NLP Feature</span>
-            </h2>
-
-            <div class="form-grid one-col">
-                <div class="form-group">
-                    <label>Describe why you need this loan <span class="optional-badge">Optional</span></label>
-                    <textarea name="loan_reason" rows="4" placeholder="e.g. I need this loan to purchase a new home for my family in Bhopal. I have stable employment and can repay on time."></textarea>
-                    <small class="helper-text">This text can be analyzed later for explainable AI insights and loan intent understanding.</small>
+        <!-- STEP 3 -->
+        <div class="form-step" id="step-3">
+            <section class="form-section">
+                <div class="section-header">
+                    <h3>📋 Review & Submit</h3>
+                    <p>Review the entered details before final submission</p>
                 </div>
+
+                <div class="review-box">
+                    <p><strong>Customer Name:</strong> <span id="review-customer_name">-</span></p>
+                    <p><strong>Customer Email:</strong> <span id="review-customer_email">-</span></p>
+                    <p><strong>Age:</strong> <span id="review-person_age">-</span></p>
+                    <p><strong>Gender:</strong> <span id="review-person_gender">-</span></p>
+                    <p><strong>Education:</strong> <span id="review-person_education">-</span></p>
+
+                    <hr>
+
+                    <p><strong>Annual Income:</strong> <span id="review-person_income">-</span></p>
+                    <p><strong>Employment Experience:</strong> <span id="review-person_emp_exp">-</span></p>
+                    <p><strong>Home Ownership:</strong> <span id="review-person_home_ownership">-</span></p>
+
+                    <hr>
+
+                    <p><strong>Credit Score:</strong> <span id="review-credit_score">-</span></p>
+                    <p><strong>Credit History Length:</strong> <span id="review-credit_history_length">-</span></p>
+                    <p><strong>Previous Loan Defaults:</strong> <span id="review-previous_loan_defaults_on_file">-</span></p>
+
+                    <hr>
+
+                    <p><strong>Loan Amount:</strong> <span id="review-loan_amnt">-</span></p>
+                    <p><strong>Interest Rate:</strong> <span id="review-loan_int_rate">-</span></p>
+                    <p><strong>Loan Intent:</strong> <span id="review-loan_intent">-</span></p>
+                </div>
+            </section>
+
+            <div class="form-actions">
+                <button type="button" class="secondary-btn" id="back-step-3">← Back</button>
+                <button type="submit" class="primary-btn">Submit Application →</button>
             </div>
         </div>
 
-        <button type="submit" class="submit-btn">Check Eligibility</button>
     </form>
 </div>
 {% endblock %}
