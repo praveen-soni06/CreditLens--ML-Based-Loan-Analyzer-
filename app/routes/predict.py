@@ -1,134 +1,184 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, session, redirect, url_for
+from datetime import datetime
+from app.database.db import db, Application, Prediction
 
 predict_bp = Blueprint('predict', __name__)
-
 @predict_bp.route('/application')
 def application():
-    return render_template('index.html')
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
 
+    current_date = datetime.now().strftime("%d %b %Y")
+    application_ref = f"LN-{datetime.now().strftime('%d%m%H%M')}"
+
+    return render_template(
+        'index.html',
+        current_date=current_date,
+        application_ref=application_ref
+    )
 @predict_bp.route('/predict', methods=['POST'])
 def predict():
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+
     try:
-        # Personal Information
-        full_name = request.form.get('full_name', '').strip()
-        gender = request.form.get('gender', '')
-        marital_status = request.form.get('marital_status', '')
-        dependents = request.form.get('dependents', '')
-        education = request.form.get('education', '')
+        # -----------------------------
+        # Read form fields
+        # -----------------------------
+        customer_name = request.form.get('customer_name', '').strip()
+        customer_email = request.form.get('customer_email', '').strip()
 
-        # Financial Details
-        income = float(request.form.get('income', 0) or 0)
-        coapp_income = float(request.form.get('coapp_income', 0) or 0)
-        employment_type = request.form.get('employment_type', '')
-        credit_history = request.form.get('credit_history', '')
+        person_age = int(request.form.get('person_age', 0) or 0)
+        person_gender = int(request.form.get('person_gender', 0) or 0)
+        person_education = request.form.get('person_education', '').strip()
+
+        person_income = float(request.form.get('person_income', 0) or 0)
+        person_emp_exp = int(request.form.get('person_emp_exp', 0) or 0)
+        person_home_ownership = request.form.get('person_home_ownership', '').strip()
+
         credit_score = int(request.form.get('credit_score', 0) or 0)
+        credit_history_length = float(request.form.get('credit_history_length', 0) or 0)
+        previous_loan_defaults_on_file = int(request.form.get('previous_loan_defaults_on_file', 0) or 0)
 
-        # Loan Details
-        loan_amount = float(request.form.get('loan_amount', 0) or 0)
-        loan_term = int(request.form.get('loan_term', 0) or 0)
-        property_area = request.form.get('property_area', '')
-        loan_intent = request.form.get('loan_intent', '')
+        loan_amnt = float(request.form.get('loan_amnt', 0) or 0)
+        loan_int_rate = float(request.form.get('loan_int_rate', 0) or 0)
+        loan_intent = request.form.get('loan_intent', '').strip()
 
-        # Optional AI/NLP text
-        loan_reason = request.form.get('loan_reason', '').strip()
+        loan_percent_income = round((loan_amnt / person_income), 4) if person_income > 0 else 0
 
     except ValueError:
         return render_template(
             'result.html',
             result="Rejected",
-            reasons=["Invalid input values. Please enter valid numeric data."]
+            reasons=["Invalid input values. Please enter valid numeric data."],
+            suggestions=["Check all numeric fields and submit again."],
+            risk_level="High",
+            applicant_name="Applicant",
+            application_id=None
         )
 
-    # ----------------------------
-    # Smart rule-based evaluation
-    # ----------------------------
-    reasons = []
-    suggestions = []
+    # -----------------------------
+    # Simple demo ML-style logic
+    # -----------------------------
     result = "Approved"
     risk_level = "Low"
+    reasons = []
+    suggestions = []
 
-    total_income = income + coapp_income
-
-    # Rule 1: Very low income
-    if total_income < 20000:
-        result = "Rejected"
-        reasons.append("Combined monthly income is too low for stable loan servicing.")
-        suggestions.append("Increase declared household income or apply with a stronger co-applicant.")
-
-    # Rule 2: Low credit score
     if credit_score < 600:
         result = "Rejected"
+        risk_level = "High"
         reasons.append("Credit score is below the preferred lending threshold.")
-        suggestions.append("Improve repayment history and reduce outstanding dues to raise your credit score.")
-    elif 600 <= credit_score < 700:
-        risk_level = "Medium"
+        suggestions.append("Improve credit score by maintaining timely repayments.")
 
-    # Rule 3: Poor credit history
-    if credit_history == "0":
+    if previous_loan_defaults_on_file == 1:
         result = "Rejected"
-        reasons.append("Credit history is weak or unavailable, increasing repayment uncertainty.")
-        suggestions.append("Build a stronger credit history through smaller timely repayments.")
+        risk_level = "High"
+        reasons.append("Previous loan default history increases repayment risk.")
+        suggestions.append("Provide stronger financial documents and repayment evidence.")
 
-    # Rule 4: Loan burden too high
-    if total_income > 0 and loan_amount > total_income * 10:
-        result = "Rejected"
-        reasons.append("Requested loan amount is too high compared to total household income.")
-        suggestions.append("Reduce the loan amount or increase applicant/co-applicant income.")
-    elif total_income > 0 and loan_amount > total_income * 7 and result == "Approved":
-        risk_level = "Medium"
-
-    # Rule 5: High dependents + low income
-    if dependents in ["3+"] and total_income < 40000:
-        result = "Rejected"
-        reasons.append("Higher dependent load with limited income increases repayment risk.")
-        suggestions.append("Consider reducing loan amount or adding a financially stronger co-applicant.")
-
-    # Rule 6: Employment stability
-    if employment_type in ["freelancer"] and total_income < 50000:
+    if loan_percent_income > 0.5:
         if result == "Approved":
             risk_level = "Medium"
-        reasons.append("Freelance income may be considered less stable for loan approval.")
-        suggestions.append("Provide stronger income proof or banking statements for better evaluation.")
+        reasons.append("Loan amount is relatively high compared to annual income.")
+        suggestions.append("Consider reducing the loan amount for better eligibility.")
 
-    # Rule 7: Very long term + weak profile
-    if loan_term >= 360 and credit_score < 650:
-        result = "Rejected"
-        reasons.append("Long loan tenure with a weak credit profile increases long-term lending risk.")
-        suggestions.append("Choose a shorter loan term or improve your credit profile.")
+    if person_emp_exp < 1 and person_income < 300000:
+        if result == "Approved":
+            risk_level = "Medium"
+        reasons.append("Limited work experience may reduce repayment stability.")
+        suggestions.append("Provide employment proof or add a stronger income profile.")
 
-    # Rule 8: Optional AI/NLP-like hint (simple keyword-based for now)
-    if loan_reason:
-        positive_keywords = ["home", "family", "business", "education", "medical", "house"]
-        if any(word in loan_reason.lower() for word in positive_keywords):
-            if result == "Approved":
-                reasons.append("Loan purpose appears practical and financially justifiable.")
-
-    # If approved and no detailed reasons yet
-    if result == "Approved":
-        if not reasons:
-            reasons = [
-                "Income and repayment capacity appear acceptable.",
-                "Credit profile meets the basic eligibility threshold.",
-                "Loan request falls within a manageable financial range."
-            ]
-
-        if not suggestions:
-            suggestions = [
-                "Keep your repayment record strong to maintain eligibility.",
-                "Ensure submitted documents match declared financial details."
-            ]
-
-    # If rejected and no suggestions somehow
-    if result == "Rejected" and not suggestions:
-        suggestions = [
-            "Review your financial profile and apply again after improving eligibility factors."
+    if result == "Approved" and not reasons:
+        reasons = [
+            "Income level supports the requested loan amount.",
+            "Credit score is within the preferred approval range.",
+            "No major default indicators were found in the submitted profile."
         ]
 
+    if result == "Approved" and not suggestions:
+        suggestions = [
+            "Ensure all submitted documents match the declared values.",
+            "Maintain repayment discipline for future credit strength."
+        ]
+
+    if result == "Rejected" and not suggestions:
+        suggestions = [
+            "Review your financial profile and apply again after improving key risk factors."
+        ]
+
+    # -----------------------------
+    # Save application + prediction
+    # -----------------------------
+    try:
+        new_application = Application(
+            loan_assistant_id=session.get('user_id'),
+            customer_name=customer_name,
+            customer_email=customer_email,
+            person_age=person_age,
+            person_gender=person_gender,
+            person_education=person_education,
+            person_income=person_income,
+            person_emp_exp=person_emp_exp,
+            person_home_ownership=person_home_ownership,
+            loan_amnt=loan_amnt,
+            loan_intent=loan_intent,
+            loan_int_rate=loan_int_rate,
+            loan_percent_income=loan_percent_income,
+            credit_history_length=credit_history_length,
+            credit_score=credit_score,
+            previous_loan_defaults_on_file=previous_loan_defaults_on_file,
+            submitted_at=datetime.utcnow()
+        )
+
+        db.session.add(new_application)
+        db.session.commit()
+
+        ml_decision = 1 if result == "Approved" else 0
+
+        if result == "Approved":
+            confidence_score = 0.87 if risk_level == "Low" else 0.68
+        else:
+            confidence_score = 0.91 if risk_level == "High" else 0.62
+
+        flag = "clear" if risk_level == "Low" else "review"
+
+        new_prediction = Prediction(
+            application_id=new_application.id,
+            ml_decision=ml_decision,
+            confidence_score=confidence_score,
+            flag=flag,
+            final_decision="pending",
+            decided_by=None,
+            decision_at=None,
+            email_sent=0,
+            predicted_at=datetime.utcnow()
+        )
+
+        db.session.add(new_prediction)
+        db.session.commit()
+
+    except Exception as e:
+        db.session.rollback()
+        return render_template(
+            'result.html',
+            result="Rejected",
+            reasons=[f"Database error while saving application: {str(e)}"],
+            suggestions=["Check DB schema and field compatibility."],
+            risk_level="High",
+            applicant_name=customer_name if customer_name else "Applicant",
+            application_id=None
+        )
+
+    # -----------------------------
+    # Success result page
+    # -----------------------------
     return render_template(
         'result.html',
         result=result,
         reasons=reasons,
         suggestions=suggestions,
         risk_level=risk_level,
-        applicant_name=full_name if full_name else "Applicant"
+        applicant_name=customer_name if customer_name else "Applicant",
+        application_id=new_application.id
     )

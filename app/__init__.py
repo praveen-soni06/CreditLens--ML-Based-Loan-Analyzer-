@@ -15,9 +15,31 @@ def create_app():
     # Import models so SQLAlchemy knows about them
     from app.database.db import User, Application, Prediction
 
-    # Create tables if they don't exist
+    # Create tables + seed demo users if they don't exist
     with app.app_context():
         db.create_all()
+
+        # Demo Admin User
+        if not User.query.filter_by(email="admin@creditlens.com").first():
+            admin_user = User(
+                name="admin",
+                email="admin@creditlens.com",
+                password="admin123",
+                role="credit_manager"
+            )
+            db.session.add(admin_user)
+
+        # Demo Loan Assistant User
+        if not User.query.filter_by(email="assistant@creditlens.com").first():
+            assistant_user = User(
+                name="assistant",
+                email="assistant@creditlens.com",
+                password="assistant123",
+                role="loan_assistant"
+            )
+            db.session.add(assistant_user)
+
+        db.session.commit()
 
     # Import blueprints
     from app.routes.main import main_bp

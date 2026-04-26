@@ -99,7 +99,7 @@
                             </span>
                         </td>
                         <td>
-                            <a href="{{ url_for('dashboard.review') }}" class="table-review-btn">Review</a>
+                            <a href="{{ url_for('dashboard.review', application_id=app.id) }}" class="table-review-btn">Review</a>
                         </td>
                     </tr>
                     {% endfor %}
