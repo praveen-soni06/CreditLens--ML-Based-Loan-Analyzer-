@@ -1,17 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Dashboard{% endblock %}
+{% block title %}Credit Manager Dashboard{% endblock %}
 
 {% block content %}
 <div class="container dashboard-container">
     <!-- TOP HEADER BAR -->
     <div class="dashboard-topbar">
         <div>
-            <h1 class="dashboard-title">Admin Dashboard</h1>
-            <p class="dashboard-subtitle">Monitor loan approvals, flagged risks, and recent application activity.</p>
+            <h1 class="dashboard-title">Credit Manager Dashboard</h1>
+            <p class="dashboard-subtitle">Review AI recommendations and make final underwriting decisions.</p>
         </div>
-
-        <a href="{{ url_for('predict.application') }}" class="action-btn">+ Run New Prediction</a>
     </div>
 
     <!-- STATS -->
@@ -32,8 +30,8 @@
         </div>
 
         <div class="stat-card compact-card">
-            <h3>High Risk</h3>
-            <p>{{ stats.high_risk }}</p>
+            <h3>Pending Review</h3>
+            <p>{{ stats.pending }}</p>
         </div>
     </div>
 
@@ -71,7 +69,8 @@
                 <thead>
                     <tr>
                         <th>Applicant Name</th>
-                        <th>Status</th>
+                        <th>Final Status</th>
+                        <th>ML Recommendation</th>
                         <th>Risk Level</th>
                         <th>Action</th>
                     </tr>
@@ -82,10 +81,11 @@
                         <td>{{ app.name }}</td>
                         <td>
                             <span
-                                class="status-badge {% if app.status == 'Approved' %}status-approved{% else %}status-rejected{% endif %}">
+                                class="status-badge {% if app.status == 'Approved' %}status-approved{% elif app.status == 'Rejected' %}status-rejected{% else %}status-pending{% endif %}">
                                 {{ app.status }}
                             </span>
                         </td>
+                        <td>{{ app.ml_recommendation }}</td>
                         <td>
                             <span class="risk-badge 
             {% if app.risk == 'Low' %}

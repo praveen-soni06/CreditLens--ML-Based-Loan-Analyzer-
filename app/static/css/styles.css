@@ -55,7 +55,8 @@ body {
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     background: var(--bg);
     color: var(--text);
-    line-height: 1.5;
+    font-size: 16px;
+    line-height: 1.6;
 }
 
 a {
@@ -72,12 +73,12 @@ textarea {
 
 /* ========== COMMON LAYOUT ========== */
 main {
-    padding: 28px 22px;
+    padding: 36px 32px;
 }
 
 .container,
 .application-wrapper {
-    max-width: 1180px;
+    max-width: 1360px;
     margin: 0 auto;
 }
 
@@ -95,14 +96,14 @@ h1, h2, h3, h4 {
 .table-meta,
 .decision-subtext {
     color: var(--muted);
-    font-size: 14px;
+    font-size: 15px;
 }
 
 /* ========== NAVBAR ========== */
 .navbar {
     background: linear-gradient(135deg, var(--primary), #1449a8);
     color: #fff;
-    padding: 14px 28px;
+    padding: 16px 34px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -115,7 +116,7 @@ h1, h2, h3, h4 {
 }
 
 .logo {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 800;
     letter-spacing: 0.3px;
 }
@@ -129,8 +130,8 @@ h1, h2, h3, h4 {
 .nav-links a {
     color: #fff;
     font-weight: 600;
-    font-size: 14px;
-    padding: 8px 12px;
+    font-size: 15px;
+    padding: 10px 14px;
     border-radius: 8px;
     transition: background 0.2s ease, transform 0.2s ease;
 }
@@ -169,14 +170,14 @@ h1, h2, h3, h4 {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 10px 16px;
+    padding: 12px 18px;
     border-radius: var(--radius-sm);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
-    min-height: 42px;
+    min-height: 46px;
 }
 
 .primary-btn,
@@ -236,11 +237,11 @@ h1, h2, h3, h4 {
 
 .login-wrapper {
     width: 100%;
-    max-width: 460px;
+    max-width: 520px;
 }
 
 .login-card {
-    padding: 34px 28px 26px;
+    padding: 40px 34px 30px;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
     text-align: center;
@@ -252,14 +253,14 @@ h1, h2, h3, h4 {
 }
 
 .login-title {
-    font-size: 34px;
+    font-size: 38px;
     color: var(--primary);
     margin-bottom: 4px;
 }
 
 .login-subtitle {
     color: var(--muted);
-    font-size: 15px;
+    font-size: 16px;
     margin-bottom: 24px;
 }
 
@@ -311,7 +312,7 @@ h1, h2, h3, h4 {
 .form-group label {
     display: block;
     margin-bottom: 6px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--text-dark);
 }
@@ -329,7 +330,7 @@ h1, h2, h3, h4 {
     border-radius: var(--radius-sm);
     background: #fff;
     color: var(--text);
-    font-size: 14px;
+    font-size: 15px;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -350,7 +351,7 @@ h1, h2, h3, h4 {
     display: block;
     margin-top: 6px;
     color: var(--muted);
-    font-size: 12px;
+    font-size: 13px;
 }
 
 /* ========== DASHBOARD ========== */
@@ -369,12 +370,12 @@ h1, h2, h3, h4 {
 }
 
 .dashboard-title {
-    font-size: 32px;
+    font-size: 38px;
     margin-bottom: 4px;
 }
 
 .dashboard-subtitle {
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .stats,
@@ -399,7 +400,7 @@ h1, h2, h3, h4 {
 }
 
 .stat-card p {
-    font-size: 28px;
+    font-size: 34px;
     color: var(--primary);
     font-weight: 800;
     line-height: 1;
@@ -419,7 +420,7 @@ h1, h2, h3, h4 {
 
 .dashboard-panel h3 {
     margin-bottom: 10px;
-    font-size: 18px;
+    font-size: 20px;
 }
 
 .reason-list,
@@ -431,7 +432,7 @@ h1, h2, h3, h4 {
 .reason-list li {
     margin-bottom: 8px;
     color: #374151;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .table-panel {
@@ -470,16 +471,16 @@ h1, h2, h3, h4 {
 
 .app-table th,
 .app-table td {
-    padding: 14px 14px;
+    padding: 16px 16px;
     text-align: left;
     border-bottom: 1px solid #edf1f5;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .app-table th {
     background: #f8fbff;
     color: var(--text-dark);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.4px;
@@ -497,7 +498,7 @@ h1, h2, h3, h4 {
     justify-content: center;
     padding: 6px 12px;
     border-radius: 999px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 800;
     border: 1px solid transparent;
 }
@@ -530,7 +531,7 @@ h1, h2, h3, h4 {
 }
 
 .application-topbar {
-    padding: 18px 20px;
+    padding: 22px 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -549,13 +550,13 @@ h1, h2, h3, h4 {
 }
 
 .portal-title h2 {
-    font-size: 24px;
+    font-size: 28px;
     color: var(--primary);
     margin-bottom: 2px;
 }
 
 .portal-title p {
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .user-meta {
@@ -565,8 +566,8 @@ h1, h2, h3, h4 {
 }
 
 .user-avatar {
-    width: 42px;
-    height: 42px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--primary), #2a5fbe);
     color: #fff;
@@ -578,7 +579,7 @@ h1, h2, h3, h4 {
 }
 
 .user-meta strong {
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .application-meta {
@@ -588,7 +589,7 @@ h1, h2, h3, h4 {
     align-items: center;
     gap: 14px;
     flex-wrap: wrap;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .application-meta span strong {
@@ -610,7 +611,7 @@ h1, h2, h3, h4 {
     background: #f8fafc;
     border: 1px solid var(--border);
     color: var(--muted);
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 700;
     transition: all 0.2s ease;
 }
@@ -629,7 +630,7 @@ h1, h2, h3, h4 {
 
 /* ========== LOAN FORM CARD ========== */
 .loan-form-card {
-    padding: 20px;
+    padding: 24px;
 }
 
 .form-step {
@@ -641,7 +642,7 @@ h1, h2, h3, h4 {
 }
 
 .form-section {
-    padding: 18px;
+    padding: 22px;
     margin-bottom: 18px;
     background: #fff;
 }
@@ -653,12 +654,12 @@ h1, h2, h3, h4 {
 }
 
 .section-header h3 {
-    font-size: 19px;
+    font-size: 21px;
     margin-bottom: 3px;
 }
 
 .section-header p {
-    font-size: 13px;
+    font-size: 15px;
 }
 
 .form-grid {
@@ -682,7 +683,7 @@ h1, h2, h3, h4 {
     color: #1e3a8a;
     border-radius: 10px;
     padding: 12px 14px;
-    font-size: 13px;
+    font-size: 15px;
 }
 
 .auto-note code {
@@ -711,7 +712,7 @@ h1, h2, h3, h4 {
 
 .review-box p {
     margin: 8px 0;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .review-box strong {
@@ -726,7 +727,7 @@ h1, h2, h3, h4 {
 
 /* ========== RESULT PAGE ========== */
 .container > h1 {
-    font-size: 30px;
+    font-size: 36px;
     margin-bottom: 4px;
 }
 
@@ -756,12 +757,12 @@ h1, h2, h3, h4 {
 }
 
 .decision-card h2 {
-    font-size: 28px;
+    font-size: 32px;
     margin-bottom: 4px;
 }
 
 .decision-subtext {
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .result-sections {
@@ -776,7 +777,7 @@ h1, h2, h3, h4 {
 }
 
 .result-panel h3 {
-    font-size: 18px;
+    font-size: 20px;
     margin-bottom: 8px;
 }
 
@@ -800,8 +801,152 @@ h1, h2, h3, h4 {
 }
 
 .review-container {
-    max-width: 1100px;
+    max-width: 1280px;
     margin: 0 auto;
+}
+
+.review-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.review-title {
+    font-size: 38px;
+    margin-bottom: 4px;
+}
+
+.review-subtitle {
+    color: var(--muted);
+    font-size: 16px;
+}
+
+.review-summary-banner,
+.manager-decision-panel {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 22px;
+    margin-bottom: 18px;
+}
+
+.review-summary-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.approved-banner {
+    border-left: 5px solid #16a34a;
+}
+
+.rejected-banner {
+    border-left: 5px solid #dc2626;
+}
+
+.review-applicant-name {
+    font-size: 28px;
+    margin-bottom: 4px;
+}
+
+.review-ai-status {
+    color: var(--muted);
+    font-size: 15px;
+}
+
+.review-badges,
+.manager-decision-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.confidence-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+    background: #eef2ff;
+    color: #3730a3;
+    border: 1px solid #c7d2fe;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.summary-card {
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+}
+
+.summary-label {
+    display: block;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.manager-decision-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.manager-decision-panel h3 {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.manager-decision-panel p {
+    color: var(--muted);
+    font-size: 15px;
+}
+
+.approve-btn,
+.reject-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    min-width: 130px;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.approve-btn {
+    background: #15803d;
+}
+
+.reject-btn {
+    background: #b91c1c;
+}
+
+.approve-btn:hover,
+.reject-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.94);
 }
 
 .review-card,
@@ -933,13 +1078,16 @@ h1, h2, h3, h4 {
     .decision-header,
     .result-actions,
     .table-header,
-    .review-header {
+    .review-header,
+    .review-summary-banner,
+    .manager-decision-panel {
         flex-direction: column;
         align-items: stretch;
     }
 
     .two-col,
     .three-col,
+    .summary-grid,
     .progress-strip {
         grid-template-columns: 1fr;
     }
@@ -975,7 +1123,9 @@ h1, h2, h3, h4 {
     .back-btn,
     .table-review-btn,
     .action-link-btn,
-    .submit-btn {
+    .submit-btn,
+    .approve-btn,
+    .reject-btn {
         width: 100%;
     }
 }
@@ -1017,4 +1167,10 @@ h1, h2, h3, h4 {
         padding: 10px 10px;
         font-size: 13px;
     }
+}
+
+.status-pending {
+    background: #e0f2fe;
+    color: #075985;
+    border-color: #bae6fd;
 }

@@ -12,8 +12,12 @@
     <nav class="navbar">
         <div class="logo">CreditLens</div>
         <div class="nav-links">
+            {% if session.get('role') == 'loan_assistant' %}
             <a href="{{ url_for('predict.application') }}">New Application</a>
+            {% endif %}
+            {% if session.get('role') == 'credit_manager' %}
             <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
+            {% endif %}
             <a href="{{ url_for('auth.logout') }}">Logout</a>
         </div>
     </nav>
