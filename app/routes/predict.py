@@ -1,12 +1,191 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from datetime import datetime
+from functools import lru_cache
+from pathlib import Path
+
+import joblib
+import pandas as pd
+
 from app.database.db import db, Application, Prediction
 
 predict_bp = Blueprint('predict', __name__)
-@predict_bp.route('/application')
-def application():
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+MODEL_PATH = PROJECT_ROOT / 'ML' / 'model.pkl'
+SCALER_PATH = PROJECT_ROOT / 'ML' / 'scaler.pkl'
+
+FEATURE_COLUMNS = [
+    'person_age',
+    'person_gender',
+    'person_education',
+    'person_income',
+    'person_emp_exp',
+    'loan_amnt',
+    'loan_int_rate',
+    'loan_percent_income',
+    'credit_history_length',
+    'credit_score',
+    'previous_loan_defaults_on_file',
+    'age_group',
+    'income_group',
+    'credit_category',
+    'person_home_ownership_OTHER',
+    'person_home_ownership_OWN',
+    'person_home_ownership_RENT',
+    'loan_intent_EDUCATION',
+    'loan_intent_HOMEIMPROVEMENT',
+    'loan_intent_MEDICAL',
+    'loan_intent_PERSONAL',
+    'loan_intent_VENTURE',
+]
+
+EDUCATION_ORDER = {
+    'High School': 0,
+    'Associate': 1,
+    'Bachelor': 2,
+    'Master': 3,
+    'Doctorate': 4,
+}
+
+
+def require_loan_assistant():
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
+
+    if session.get('role') != 'loan_assistant':
+        return redirect(url_for('dashboard.dashboard'))
+
+    return None
+
+
+@lru_cache(maxsize=1)
+def load_ml_artifacts():
+    return joblib.load(MODEL_PATH), joblib.load(SCALER_PATH)
+
+
+def get_age_group_value(age):
+    if age <= 25:
+        return 0
+    if age <= 35:
+        return 1
+    if age <= 45:
+        return 2
+    if age <= 60:
+        return 3
+    return 4
+
+
+def get_income_group_value(income):
+    if income <= 30000:
+        return 0
+    if income <= 60000:
+        return 1
+    if income <= 100000:
+        return 2
+    return 3
+
+
+def get_credit_category_value(score):
+    if score <= 588:
+        return 0
+    if score <= 670:
+        return 1
+    if score <= 740:
+        return 2
+    if score <= 800:
+        return 3
+    return 4
+
+
+def build_model_input(
+    person_age,
+    person_gender,
+    person_education,
+    person_income,
+    person_emp_exp,
+    person_home_ownership,
+    loan_amnt,
+    loan_intent,
+    loan_int_rate,
+    loan_percent_income,
+    credit_history_length,
+    credit_score,
+    previous_loan_defaults_on_file,
+):
+    feature_values = {
+        'person_age': person_age,
+        'person_gender': person_gender,
+        'person_education': EDUCATION_ORDER[person_education],
+        'person_income': person_income,
+        'person_emp_exp': person_emp_exp,
+        'loan_amnt': loan_amnt,
+        'loan_int_rate': loan_int_rate,
+        'loan_percent_income': loan_percent_income,
+        'credit_history_length': credit_history_length,
+        'credit_score': credit_score,
+        'previous_loan_defaults_on_file': previous_loan_defaults_on_file,
+        'age_group': get_age_group_value(person_age),
+        'income_group': get_income_group_value(person_income),
+        'credit_category': get_credit_category_value(credit_score),
+        'person_home_ownership_OTHER': int(person_home_ownership == 'OTHER'),
+        'person_home_ownership_OWN': int(person_home_ownership == 'OWN'),
+        'person_home_ownership_RENT': int(person_home_ownership == 'RENT'),
+        'loan_intent_EDUCATION': int(loan_intent == 'EDUCATION'),
+        'loan_intent_HOMEIMPROVEMENT': int(loan_intent == 'HOMEIMPROVEMENT'),
+        'loan_intent_MEDICAL': int(loan_intent == 'MEDICAL'),
+        'loan_intent_PERSONAL': int(loan_intent == 'PERSONAL'),
+        'loan_intent_VENTURE': int(loan_intent == 'VENTURE'),
+    }
+
+    return pd.DataFrame([[feature_values[column] for column in FEATURE_COLUMNS]], columns=FEATURE_COLUMNS)
+
+
+def get_prediction_notes(result, risk_level, confidence_score, credit_score,
+                         previous_loan_defaults_on_file, loan_percent_income,
+                         person_emp_exp, person_income):
+    reasons = [
+        f"ML model predicted {result.lower()} with {confidence_score:.0%} confidence."
+    ]
+    suggestions = []
+
+    if credit_score < 600:
+        reasons.append("Credit score is below the preferred lending threshold.")
+        suggestions.append("Improve credit score by maintaining timely repayments.")
+
+    if previous_loan_defaults_on_file == 1:
+        reasons.append("Previous loan default history increases repayment risk.")
+        suggestions.append("Provide stronger financial documents and repayment evidence.")
+
+    if loan_percent_income > 0.5:
+        reasons.append("Loan amount is relatively high compared to annual income.")
+        suggestions.append("Consider reducing the loan amount for better eligibility.")
+
+    if person_emp_exp < 1 and person_income < 300000:
+        reasons.append("Limited work experience may reduce repayment stability.")
+        suggestions.append("Provide employment proof or add a stronger income profile.")
+
+    if result == "Approved" and not suggestions:
+        suggestions = [
+            "Ensure all submitted documents match the declared values.",
+            "Maintain repayment discipline for future credit strength."
+        ]
+
+    if result == "Rejected" and not suggestions:
+        suggestions = [
+            "Review your financial profile and apply again after improving key risk factors."
+        ]
+
+    if risk_level == "Medium":
+        suggestions.append("Send this application for manager review before final approval.")
+
+    return reasons, suggestions
+
+
+@predict_bp.route('/application')
+def application():
+    guard = require_loan_assistant()
+    if guard:
+        return guard
 
     current_date = datetime.now().strftime("%d %b %Y")
     application_ref = f"LN-{datetime.now().strftime('%d%m%H%M')}"
@@ -18,8 +197,9 @@ def application():
     )
 @predict_bp.route('/predict', methods=['POST'])
 def predict():
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
+    guard = require_loan_assistant()
+    if guard:
+        return guard
 
     try:
         # -----------------------------
@@ -58,54 +238,64 @@ def predict():
         )
 
     # -----------------------------
-    # Simple demo ML-style logic
+    # Real ML model prediction
     # -----------------------------
-    result = "Approved"
-    risk_level = "Low"
-    reasons = []
-    suggestions = []
+    try:
+        model, scaler = load_ml_artifacts()
+        model_input = build_model_input(
+            person_age=person_age,
+            person_gender=person_gender,
+            person_education=person_education,
+            person_income=person_income,
+            person_emp_exp=person_emp_exp,
+            person_home_ownership=person_home_ownership,
+            loan_amnt=loan_amnt,
+            loan_intent=loan_intent,
+            loan_int_rate=loan_int_rate,
+            loan_percent_income=loan_percent_income,
+            credit_history_length=credit_history_length,
+            credit_score=credit_score,
+            previous_loan_defaults_on_file=previous_loan_defaults_on_file,
+        )
+        scaled_input = scaler.transform(model_input)
+        ml_decision = int(model.predict(scaled_input)[0])
 
-    if credit_score < 600:
-        result = "Rejected"
-        risk_level = "High"
-        reasons.append("Credit score is below the preferred lending threshold.")
-        suggestions.append("Improve credit score by maintaining timely repayments.")
+        if hasattr(model, 'predict_proba'):
+            probabilities = model.predict_proba(scaled_input)[0]
+            classes = list(model.classes_)
+            confidence_score = float(probabilities[classes.index(ml_decision)])
+        else:
+            confidence_score = 0.75
 
-    if previous_loan_defaults_on_file == 1:
-        result = "Rejected"
-        risk_level = "High"
-        reasons.append("Previous loan default history increases repayment risk.")
-        suggestions.append("Provide stronger financial documents and repayment evidence.")
-
-    if loan_percent_income > 0.5:
-        if result == "Approved":
+        result = "Approved" if ml_decision == 1 else "Rejected"
+        if result == "Rejected":
+            risk_level = "High"
+        elif confidence_score >= 0.75:
+            risk_level = "Low"
+        else:
             risk_level = "Medium"
-        reasons.append("Loan amount is relatively high compared to annual income.")
-        suggestions.append("Consider reducing the loan amount for better eligibility.")
 
-    if person_emp_exp < 1 and person_income < 300000:
-        if result == "Approved":
-            risk_level = "Medium"
-        reasons.append("Limited work experience may reduce repayment stability.")
-        suggestions.append("Provide employment proof or add a stronger income profile.")
+        reasons, suggestions = get_prediction_notes(
+            result=result,
+            risk_level=risk_level,
+            confidence_score=confidence_score,
+            credit_score=credit_score,
+            previous_loan_defaults_on_file=previous_loan_defaults_on_file,
+            loan_percent_income=loan_percent_income,
+            person_emp_exp=person_emp_exp,
+            person_income=person_income,
+        )
 
-    if result == "Approved" and not reasons:
-        reasons = [
-            "Income level supports the requested loan amount.",
-            "Credit score is within the preferred approval range.",
-            "No major default indicators were found in the submitted profile."
-        ]
-
-    if result == "Approved" and not suggestions:
-        suggestions = [
-            "Ensure all submitted documents match the declared values.",
-            "Maintain repayment discipline for future credit strength."
-        ]
-
-    if result == "Rejected" and not suggestions:
-        suggestions = [
-            "Review your financial profile and apply again after improving key risk factors."
-        ]
+    except Exception as e:
+        return render_template(
+            'result.html',
+            result="Rejected",
+            reasons=[f"ML prediction error: {str(e)}"],
+            suggestions=["Check that ML/model.pkl and ML/scaler.pkl exist and match the training feature columns."],
+            risk_level="High",
+            applicant_name=customer_name if customer_name else "Applicant",
+            application_id=None
+        )
 
     # -----------------------------
     # Save application + prediction
@@ -134,23 +324,25 @@ def predict():
         db.session.add(new_application)
         db.session.commit()
 
-        ml_decision = 1 if result == "Approved" else 0
-
-        if result == "Approved":
-            confidence_score = 0.87 if risk_level == "Low" else 0.68
+        if risk_level == "Medium":
+            flag = "review"
+            final_decision = "pending"
+            decided_by = None
+            decision_at_value = None
         else:
-            confidence_score = 0.91 if risk_level == "High" else 0.62
-
-        flag = "clear" if risk_level == "Low" else "review"
+            flag = "clear"
+            final_decision = result.lower()
+            decided_by = None
+            decision_at_value = datetime.utcnow()
 
         new_prediction = Prediction(
             application_id=new_application.id,
             ml_decision=ml_decision,
             confidence_score=confidence_score,
             flag=flag,
-            final_decision="pending",
-            decided_by=None,
-            decision_at=None,
+            final_decision=final_decision,
+            decided_by=decided_by,
+            decision_at=decision_at_value,
             email_sent=0,
             predicted_at=datetime.utcnow()
         )

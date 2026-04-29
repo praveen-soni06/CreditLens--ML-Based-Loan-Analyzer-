@@ -6,3 +6,4 @@ pandas
 numpy
 imbalanced-learn
 flask-sqlalchemy
+joblib

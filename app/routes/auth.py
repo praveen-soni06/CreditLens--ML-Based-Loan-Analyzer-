@@ -9,6 +9,11 @@ def root():
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'GET' and 'user_id' in session:
+        if session.get('role') == 'credit_manager':
+            return redirect(url_for('dashboard.dashboard'))
+        return redirect(url_for('predict.application'))
+
     if request.method == 'POST':
         # Support both old frontend (username) and new frontend (email)
         username = request.form.get('username', '').strip()

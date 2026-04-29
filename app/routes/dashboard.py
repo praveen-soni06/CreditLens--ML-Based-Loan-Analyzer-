@@ -1,55 +1,95 @@
-from flask import Blueprint, render_template, redirect, url_for
+from datetime import datetime
+
+from flask import Blueprint, render_template, redirect, request, session, url_for
+
+from app.database.db import Application, Prediction, db
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
+
+def require_credit_manager():
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+
+    if session.get('role') != 'credit_manager':
+        return redirect(url_for('predict.application'))
+
+    return None
+
+
+def get_risk_level(prediction):
+    if not prediction:
+        return "Medium"
+
+    if prediction.flag == "clear":
+        return "Low"
+
+    if prediction.ml_decision == 0:
+        return "High"
+
+    return "Medium"
+
+
+def get_final_status(prediction):
+    if not prediction:
+        return "Pending Review"
+
+    if prediction.final_decision == "approved":
+        return "Approved"
+
+    if prediction.final_decision == "rejected":
+        return "Rejected"
+
+    return "Pending Review"
+
+
 @dashboard_bp.route('/dashboard')
 def dashboard():
-    from app.database.db import Application, Prediction
+    guard = require_credit_manager()
+    if guard:
+        return guard
 
     applications = Application.query.order_by(Application.id.desc()).all()
 
     recent_applications = []
     approved_count = 0
     rejected_count = 0
+    pending_count = 0
     high_risk_count = 0
 
     for application in applications:
         prediction = Prediction.query.filter_by(application_id=application.id).first()
 
+        status = get_final_status(prediction)
+        risk = get_risk_level(prediction)
         if prediction:
-            status = "Approved" if prediction.ml_decision == 1 else "Rejected"
-
-            if status == "Approved":
-                approved_count += 1
-            else:
-                rejected_count += 1
-
-            # Risk mapping
-            if prediction.flag == "clear":
-                risk = "Low"
-            elif prediction.flag == "review":
-                risk = "Medium"
-            else:
-                risk = "High"
-
-            if risk == "High":
-                high_risk_count += 1
-
+            ml_recommendation = "Approved" if prediction.ml_decision == 1 else "Rejected"
         else:
-            status = "Pending"
-            risk = "Medium"
+            ml_recommendation = "Pending"
+
+        if status == "Approved":
+            approved_count += 1
+        elif status == "Rejected":
+            rejected_count += 1
+        else:
+            pending_count += 1
+
+        if risk == "High":
+            high_risk_count += 1
 
         recent_applications.append({
             "id": application.id,
             "name": application.customer_name,
             "status": status,
-            "risk": risk
+            "risk": risk,
+            "ml_recommendation": ml_recommendation
         })
 
     stats = {
         "total": len(applications),
         "approved": approved_count,
         "rejected": rejected_count,
+        "pending": pending_count,
         "high_risk": high_risk_count
     }
 
@@ -70,7 +110,9 @@ def dashboard():
 
 @dashboard_bp.route('/review')
 def review_default():
-    from app.database.db import Application
+    guard = require_credit_manager()
+    if guard:
+        return guard
 
     latest_application = Application.query.order_by(Application.id.desc()).first()
 
@@ -82,7 +124,9 @@ def review_default():
 
 @dashboard_bp.route('/review/<int:application_id>')
 def review(application_id):
-    from app.database.db import Application, Prediction
+    guard = require_credit_manager()
+    if guard:
+        return guard
 
     application = Application.query.get_or_404(application_id)
     prediction = Prediction.query.filter_by(application_id=application_id).first()
@@ -97,12 +141,7 @@ def review(application_id):
         if prediction.confidence_score is not None:
             confidence = round(prediction.confidence_score * 100)
 
-        if prediction.flag == "clear":
-            risk_level = "Low"
-        elif prediction.flag == "review":
-            risk_level = "Medium"
-        else:
-            risk_level = "High"
+        risk_level = get_risk_level(prediction)
 
     decision_factors = []
 
@@ -139,5 +178,29 @@ def review(application_id):
         risk_level=risk_level,
         confidence=confidence,
         decision_factors=decision_factors,
-        application_id=application.id
+        application_id=application.id,
+        final_decision=prediction.final_decision if prediction else "pending",
+        decided_by=prediction.decided_by if prediction else None,
+        decision_at=prediction.decision_at if prediction else None
     )
+
+
+@dashboard_bp.route('/review/<int:application_id>/decision', methods=['POST'])
+def decide_application(application_id):
+    guard = require_credit_manager()
+    if guard:
+        return guard
+
+    prediction = Prediction.query.filter_by(application_id=application_id).first_or_404()
+    decision = request.form.get('decision', '').strip().lower()
+
+    if decision not in ("approved", "rejected"):
+        return redirect(url_for('dashboard.review', application_id=application_id))
+
+    prediction.final_decision = decision
+    prediction.decided_by = session.get('user_id')
+    prediction.decision_at = datetime.utcnow()
+
+    db.session.commit()
+
+    return redirect(url_for('dashboard.review', application_id=application_id))

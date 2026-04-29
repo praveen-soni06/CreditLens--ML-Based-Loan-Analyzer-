@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Loan Decision Result{% endblock %}
+{% block title %}Loan Prediction Result{% endblock %}
 
 {% block content %}
 <div class="progress-strip">
@@ -11,17 +11,19 @@
 </div>
 <div class="container">
     <h1>ML Prediction Result</h1>
-    <p class="subtitle">AI-assisted decision summary for <strong>{{ applicant_name }}</strong></p>
+    <p class="subtitle">AI recommendation for <strong>{{ applicant_name }}</strong>. Only medium-risk cases require credit manager review.</p>
 
     <div class="decision-card {% if result == 'Approved' %}approved-card{% else %}rejected-card{% endif %}">
         <div class="decision-header">
             <div>
-                <h2>Decision: {{ result }}</h2>
+                <h2>ML Recommendation: {{ result }}</h2>
                 <p class="decision-subtext">
-                    {% if result == "Approved" %}
-                    Your application meets the current eligibility criteria.
+                    {% if risk_level == "Low" %}
+                    This application is low risk and automatically approved by the model.
+                    {% elif risk_level == "Medium" %}
+                    This application needs credit manager review before a final decision.
                     {% else %}
-                    Your application currently falls below the preferred eligibility criteria.
+                    This application is high risk and automatically rejected by the model.
                     {% endif %}
                 </p>
             </div>
@@ -60,12 +62,15 @@
     </div>
 
     <div class="result-actions">
-        {% if application_id %}
-        <a href="{{ url_for('dashboard.review', application_id=application_id) }}" class="back-btn">Review
-            Application</a>
+        {% if session.get('role') == 'credit_manager' %}
+            {% if application_id %}
+            <a href="{{ url_for('dashboard.review', application_id=application_id) }}" class="back-btn">Review Application</a>
+            {% endif %}
+            <a href="{{ url_for('dashboard.dashboard') }}" class="action-link-btn secondary-action">Go to Dashboard</a>
         {% endif %}
-        <a href="{{ url_for('dashboard.dashboard') }}" class="action-link-btn secondary-action">Go to Dashboard</a>
+        {% if session.get('role') == 'loan_assistant' %}
         <a href="{{ url_for('predict.application') }}" class="action-link-btn neutral-action">New Application</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

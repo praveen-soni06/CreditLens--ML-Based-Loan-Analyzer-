@@ -9,10 +9,8 @@
     <div class="review-hero">
         <div>
             <h1 class="review-title">Application Review</h1>
-            <p class="review-subtitle">AI recommendation with human-in-the-loop underwriting review</p>
+            <p class="review-subtitle">AI recommendation with credit manager final decision control</p>
         </div>
-
-        <a href="{{ url_for('predict.application') }}" class="action-btn">+ New Application</a>
     </div>
 
     <!-- APPLICANT SUMMARY BANNER -->
@@ -20,6 +18,17 @@
         <div>
             <h2 class="review-applicant-name">{{ applicant_name }}</h2>
             <p class="review-ai-status">AI Recommendation: <strong>{{ ai_recommendation }}</strong></p>
+            <p class="review-ai-status">Final Decision:
+                <strong>
+                    {% if final_decision == 'approved' %}
+                    Approved
+                    {% elif final_decision == 'rejected' %}
+                    Rejected
+                    {% else %}
+                    Pending Review
+                    {% endif %}
+                </strong>
+            </p>
         </div>
 
         <div class="review-badges">
@@ -104,9 +113,32 @@
     </div>
 
     <!-- ACTION BUTTONS -->
+    <div class="manager-decision-panel">
+        <div>
+            <h3>Credit Manager Decision</h3>
+            <p>
+                {% if final_decision == 'pending' %}
+                Choose the final customer-facing decision after reviewing the model recommendation and applicant data.
+                {% else %}
+                This application has already been finalized.
+                {% endif %}
+            </p>
+        </div>
+
+        {% if final_decision == 'pending' %}
+        <form method="POST" action="{{ url_for('dashboard.decide_application', application_id=application_id) }}" class="manager-decision-actions">
+            <button type="submit" name="decision" value="approved" class="approve-btn">Approve</button>
+            <button type="submit" name="decision" value="rejected" class="reject-btn">Reject</button>
+        </form>
+        {% else %}
+        <span class="status-badge {% if final_decision == 'approved' %}status-approved{% else %}status-rejected{% endif %}">
+            Final: {{ final_decision|title }}
+        </span>
+        {% endif %}
+    </div>
+
     <div class="result-actions">
         <a href="{{ url_for('dashboard.dashboard') }}" class="secondary-btn">Go to Dashboard</a>
-        <a href="{{ url_for('predict.application') }}" class="back-btn">New Application</a>
     </div>
 
 </div>
