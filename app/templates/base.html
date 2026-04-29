@@ -5,12 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}CreditLens{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/creditlens-logo.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
 <body>
     <nav class="navbar">
-        <div class="logo">CreditLens</div>
+        <div class="brand-lockup">
+            <img class="brand-logo-img" src="{{ url_for('static', filename='images/creditlens-logo.png') }}" alt="CreditLens logo">
+            <div>
+                <div class="logo">CreditLens</div>
+                <span class="nav-role">{{ session.get('role', 'guest')|replace('_', ' ')|title }}</span>
+            </div>
+        </div>
         <div class="nav-links">
             {% if session.get('role') == 'loan_assistant' %}
             <a href="{{ url_for('predict.application') }}">New Application</a>

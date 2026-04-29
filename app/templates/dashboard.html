@@ -6,9 +6,12 @@
 <div class="container dashboard-container">
     <!-- TOP HEADER BAR -->
     <div class="dashboard-topbar">
-        <div>
-            <h1 class="dashboard-title">Credit Manager Dashboard</h1>
-            <p class="dashboard-subtitle">Review AI recommendations and make final underwriting decisions.</p>
+        <div class="portal-title">
+            <img class="portal-logo-img" src="{{ url_for('static', filename='images/creditlens-logo.png') }}" alt="CreditLens logo">
+            <div>
+                <h1 class="dashboard-title">Credit Manager Dashboard</h1>
+                <p class="dashboard-subtitle">Review AI recommendations and make final underwriting decisions.</p>
+            </div>
         </div>
     </div>
 
@@ -78,14 +81,22 @@
                 <tbody>
                     {% for app in recent_applications %}
                     <tr>
-                        <td>{{ app.name }}</td>
+                        <td>
+                            <span class="applicant-chip">{{ app.name[:1]|upper }}</span>
+                            <strong>{{ app.name }}</strong>
+                        </td>
                         <td>
                             <span
                                 class="status-badge {% if app.status == 'Approved' %}status-approved{% elif app.status == 'Rejected' %}status-rejected{% else %}status-pending{% endif %}">
                                 {{ app.status }}
                             </span>
                         </td>
-                        <td>{{ app.ml_recommendation }}</td>
+                        <td>
+                            <span
+                                class="ml-badge {% if app.ml_recommendation == 'Approved' %}ml-approved{% elif app.ml_recommendation == 'Rejected' %}ml-rejected{% else %}ml-pending{% endif %}">
+                                {{ app.ml_recommendation }}
+                            </span>
+                        </td>
                         <td>
                             <span class="risk-badge 
             {% if app.risk == 'Low' %}

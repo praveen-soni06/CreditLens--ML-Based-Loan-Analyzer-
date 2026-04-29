@@ -6,15 +6,15 @@
 <div class="application-wrapper">
     <div class="application-topbar">
         <div class="portal-title">
-            <span class="portal-icon">🏦</span>
+            <img class="portal-logo-img" src="{{ url_for('static', filename='images/creditlens-logo.png') }}" alt="CreditLens logo">
             <div>
-                <h2>CreditLens — Credit Underwriting Portal</h2>
+                <h2>CreditLens - Credit Underwriting Portal</h2>
                 <p>Loan application intake for ML-based credit decisioning</p>
             </div>
         </div>
 
         <div class="user-meta">
-            <div class="user-avatar">CL</div>
+            <div class="user-avatar">LA</div>
             <div>
                 <strong>{{ session.get('user_name', 'Loan Officer') }}</strong>
                 <p>{{ session.get('role', 'loan_assistant')|replace('_', ' ')|title }}</p>
@@ -36,13 +36,10 @@
 
     <form method="POST" action="{{ url_for('predict.predict') }}" class="loan-form-card" id="loanApplicationForm">
 
-        <!-- STEP 1 -->
         <div class="form-step active-step" id="step-1">
-
-            <!-- PERSONAL DETAILS -->
             <section class="form-section">
                 <div class="section-header">
-                    <h3>👤 Personal Details</h3>
+                    <h3>Personal Details</h3>
                     <p>Basic customer information</p>
                 </div>
 
@@ -93,24 +90,20 @@
             </section>
 
             <div class="form-actions">
-                <a href="{{ url_for('dashboard.dashboard') }}" class="secondary-btn">Cancel</a>
-                <button type="button" class="primary-btn" id="next-step-1">Next →</button>
+                <button type="button" class="primary-btn" id="next-step-1">Next</button>
             </div>
         </div>
 
-        <!-- STEP 2 -->
         <div class="form-step" id="step-2">
-
-            <!-- FINANCIAL DETAILS -->
             <section class="form-section">
                 <div class="section-header">
-                    <h3>💼 Financial Details</h3>
+                    <h3>Financial Details</h3>
                     <p>Income and employment information</p>
                 </div>
 
                 <div class="form-grid three-col">
                     <div class="form-group">
-                        <label>Annual Income (₹) <span class="required">*</span></label>
+                        <label>Annual Income (INR) <span class="required">*</span></label>
                         <input type="number" name="person_income" placeholder="e.g. 600000" min="0" step="0.01" required>
                         <small>person_income</small>
                     </div>
@@ -135,10 +128,9 @@
                 </div>
             </section>
 
-            <!-- CREDIT INFORMATION -->
             <section class="form-section">
                 <div class="section-header">
-                    <h3>⭐ Credit Information</h3>
+                    <h3>Credit Information</h3>
                     <p>Credit bureau data</p>
                 </div>
 
@@ -146,7 +138,7 @@
                     <div class="form-group">
                         <label>Credit Score <span class="required">*</span></label>
                         <input type="number" name="credit_score" placeholder="e.g. 680" min="300" max="900" required>
-                        <small>credit_score (300–900)</small>
+                        <small>credit_score (300-900)</small>
                     </div>
 
                     <div class="form-group">
@@ -167,16 +159,15 @@
                 </div>
             </section>
 
-            <!-- LOAN DETAILS -->
             <section class="form-section">
                 <div class="section-header">
-                    <h3>💳 Loan Details</h3>
+                    <h3>Loan Details</h3>
                     <p>Loan amount and purpose</p>
                 </div>
 
                 <div class="form-grid three-col">
                     <div class="form-group">
-                        <label>Loan Amount (₹) <span class="required">*</span></label>
+                        <label>Loan Amount (INR) <span class="required">*</span></label>
                         <input type="number" name="loan_amnt" placeholder="e.g. 200000" min="0" step="0.01" required>
                         <small>loan_amnt</small>
                     </div>
@@ -203,22 +194,21 @@
                 </div>
 
                 <div class="auto-note">
-                    <strong>Auto:</strong> Flask will calculate <code>loan_percent_income</code> =
-                    <code>loan_amnt ÷ person_income</code>
+                    <strong>Auto calculated:</strong> Flask saves <code>loan_percent_income</code> from
+                    <code>loan_amnt / person_income</code>.
                 </div>
             </section>
 
             <div class="form-actions">
-                <button type="button" class="secondary-btn" id="back-step-2">← Back</button>
-                <button type="button" class="primary-btn" id="next-step-2">Next →</button>
+                <button type="button" class="secondary-btn" id="back-step-2">Back</button>
+                <button type="button" class="primary-btn" id="next-step-2">Next</button>
             </div>
         </div>
 
-        <!-- STEP 3 -->
         <div class="form-step" id="step-3">
             <section class="form-section">
                 <div class="section-header">
-                    <h3>📋 Review & Submit</h3>
+                    <h3>Review & Submit</h3>
                     <p>Review the entered details before final submission</p>
                 </div>
 
@@ -250,8 +240,8 @@
             </section>
 
             <div class="form-actions">
-                <button type="button" class="secondary-btn" id="back-step-3">← Back</button>
-                <button type="submit" class="primary-btn">Submit Application →</button>
+                <button type="button" class="secondary-btn" id="back-step-3">Back</button>
+                <button type="submit" class="primary-btn">Submit Application</button>
             </div>
         </div>
 
