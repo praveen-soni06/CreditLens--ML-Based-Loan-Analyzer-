@@ -1174,3 +1174,1769 @@ h1, h2, h3, h4 {
     color: #075985;
     border-color: #bae6fd;
 }
+
+/* =========================================================
+   CREDITLENS UI REFRESH - BANKING PORTAL POLISH
+========================================================= */
+:root {
+    --primary: #123c69;
+    --primary-dark: #0b2745;
+    --primary-soft: #eaf2fb;
+    --accent: #0f766e;
+    --accent-soft: #e6f5f3;
+
+    --bg: #f3f6f9;
+    --surface: #ffffff;
+    --surface-soft: #f8fafc;
+    --border: #d8e0e8;
+    --border-soft: #e7edf3;
+
+    --text: #243244;
+    --text-dark: #101928;
+    --muted: #667085;
+
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 8px;
+
+    --shadow-sm: 0 8px 22px rgba(16, 24, 40, 0.06);
+    --shadow-md: 0 18px 44px rgba(16, 24, 40, 0.10);
+}
+
+html {
+    background: var(--bg);
+}
+
+body {
+    background:
+        linear-gradient(180deg, #edf3f8 0%, #f7f9fc 34%, #f3f6f9 100%);
+    color: var(--text);
+}
+
+main {
+    min-height: calc(100vh - 76px);
+}
+
+.container,
+.application-wrapper {
+    width: min(100%, 1320px);
+}
+
+.navbar {
+    background: #ffffff;
+    color: var(--text-dark);
+    border-bottom: 1px solid var(--border-soft);
+    box-shadow: 0 4px 18px rgba(16, 24, 40, 0.05);
+}
+
+.brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-mark,
+.login-icon,
+.portal-icon,
+.user-avatar {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 10px 22px rgba(18, 60, 105, 0.18);
+}
+
+.brand-mark {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+}
+
+.logo {
+    color: var(--primary);
+    line-height: 1;
+}
+
+.nav-role {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.nav-links a {
+    color: var(--text);
+    border: 1px solid transparent;
+}
+
+.nav-links a:hover {
+    background: var(--primary-soft);
+    border-color: #d5e4f3;
+    color: var(--primary);
+}
+
+.login-page {
+    background:
+        linear-gradient(135deg, rgba(18, 60, 105, 0.08), rgba(15, 118, 110, 0.08)),
+        #f5f8fb;
+}
+
+.login-card {
+    text-align: left;
+    border-top: 4px solid var(--accent);
+}
+
+.login-icon {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 16px;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.login-title {
+    color: var(--primary);
+}
+
+.login-form {
+    margin-top: 18px;
+}
+
+.login-footer {
+    border-left: 3px solid var(--accent);
+}
+
+.application-topbar,
+.progress-strip,
+.application-meta,
+.loan-form-card,
+.dashboard-panel,
+.stat-card,
+.decision-card,
+.result-panel,
+.review-summary-banner,
+.manager-decision-panel {
+    border-radius: 8px;
+    border: 1px solid var(--border-soft);
+    box-shadow: var(--shadow-sm);
+}
+
+.application-topbar {
+    background:
+        linear-gradient(90deg, rgba(18, 60, 105, 0.06), rgba(15, 118, 110, 0.05)),
+        #fff;
+}
+
+.portal-title h2,
+.dashboard-title,
+.review-title,
+.container > h1 {
+    letter-spacing: 0;
+}
+
+.portal-icon {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.user-avatar {
+    border-radius: 50%;
+}
+
+.progress-strip {
+    background: #fff;
+}
+
+.progress-step {
+    position: relative;
+    background: #f7f9fc;
+    border-color: var(--border-soft);
+    color: var(--muted);
+}
+
+.progress-step.active {
+    background: var(--primary-soft);
+    color: var(--primary);
+    border-color: #c7d9eb;
+}
+
+.progress-step.completed {
+    background: var(--accent-soft);
+    color: #0f5f58;
+    border-color: #b9e2dc;
+}
+
+.loan-form-card {
+    background: #fff;
+}
+
+.form-section {
+    border-radius: 8px;
+    border: 1px solid var(--border-soft);
+    box-shadow: none;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: flex-start;
+}
+
+.section-header h3 {
+    color: var(--primary);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    border-color: #cfd8e3;
+    background: #fbfdff;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.10);
+    background: #fff;
+}
+
+.primary-btn,
+.action-btn,
+.back-btn,
+.submit-btn {
+    background: var(--primary);
+}
+
+.primary-btn:hover,
+.action-btn:hover,
+.back-btn:hover,
+.submit-btn:hover {
+    background: var(--primary-dark);
+}
+
+.secondary-btn,
+.action-link-btn,
+.table-review-btn {
+    background: #a57b7b;
+    color: var(--primary);
+    border-color: #cfddeb;
+}
+
+.secondary-btn:hover,
+.action-link-btn:hover,
+.table-review-btn:hover {
+    background: var(--primary-soft);
+    border-color: #b8cbe0;
+}
+
+.auto-note {
+    background: var(--accent-soft);
+    border-color: #c1e5df;
+    color: #0f5f58;
+}
+
+.stats,
+.dashboard-stats,
+.compact-stats {
+    align-items: stretch;
+}
+
+.stat-card {
+    text-align: left;
+    border-top: 3px solid var(--primary);
+}
+
+.stat-card:nth-child(2) {
+    border-top-color: #15803d;
+}
+
+.stat-card:nth-child(3) {
+    border-top-color: #b91c1c;
+}
+
+.stat-card:nth-child(4) {
+    border-top-color: #b45309;
+}
+
+.stat-card h3 {
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.table-wrapper {
+    border-radius: 8px;
+}
+
+.app-table th {
+    background: #eef4fa;
+    color: var(--primary-dark);
+}
+
+.app-table tbody tr {
+    transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.app-table tbody tr:hover {
+    background: #f7fbff;
+}
+
+.status-badge,
+.risk-badge,
+.confidence-badge {
+    border-radius: 999px;
+}
+
+.review-summary-banner {
+    background: #fff;
+}
+
+.summary-card {
+    border-radius: 8px;
+    background: #fbfdff;
+}
+
+.manager-decision-panel {
+    border-left: 4px solid var(--accent);
+}
+
+.approve-btn {
+    background: #15803d;
+}
+
+.reject-btn {
+    background: #b42318;
+}
+
+.form-step.active-step,
+.dashboard-container,
+.review-container,
+.container,
+.login-card {
+    animation: fadeUp 0.34s ease both;
+}
+
+.primary-btn,
+.secondary-btn,
+.action-btn,
+.back-btn,
+.table-review-btn,
+.action-link-btn,
+.submit-btn,
+.approve-btn,
+.reject-btn,
+.stat-card,
+.dashboard-panel,
+.result-panel,
+.summary-card {
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease,
+        border-color 0.18s ease;
+}
+
+.primary-btn:hover,
+.secondary-btn:hover,
+.action-btn:hover,
+.back-btn:hover,
+.table-review-btn:hover,
+.action-link-btn:hover,
+.submit-btn:hover,
+.approve-btn:hover,
+.reject-btn:hover {
+    transform: translateY(-1px);
+}
+
+.stat-card:hover,
+.dashboard-panel:hover,
+.result-panel:hover,
+.summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 1024px) {
+    main {
+        padding: 26px 18px;
+    }
+
+    .navbar {
+        padding: 14px 18px;
+    }
+
+    .container,
+    .application-wrapper {
+        width: 100%;
+    }
+
+    .dashboard-title,
+    .review-title,
+    .container > h1 {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 15px;
+    }
+
+    main {
+        padding: 18px 12px;
+    }
+
+    .brand-lockup {
+        width: 100%;
+    }
+
+    .nav-links {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .nav-links a {
+        text-align: center;
+    }
+
+    .application-topbar,
+    .review-summary-banner,
+    .manager-decision-panel {
+        align-items: stretch;
+    }
+
+    .section-header {
+        display: block;
+    }
+
+    .progress-strip {
+        gap: 8px;
+    }
+
+    .progress-step {
+        font-size: 13px;
+        padding: 10px 8px;
+    }
+
+    .loan-form-card,
+    .form-section,
+    .dashboard-panel,
+    .result-panel,
+    .decision-card {
+        padding: 16px;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        position: static;
+    }
+
+    .brand-mark {
+        width: 38px;
+        height: 38px;
+    }
+
+    .logo {
+        font-size: 23px;
+    }
+
+    .nav-links {
+        grid-template-columns: 1fr;
+    }
+
+    .login-card {
+        padding: 26px 18px;
+    }
+
+    .dashboard-title,
+    .review-title,
+    .container > h1 {
+        font-size: 26px;
+    }
+
+    .decision-card h2,
+    .review-applicant-name {
+        font-size: 23px;
+    }
+
+    .app-table th,
+    .app-table td {
+        white-space: nowrap;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* =========================================================
+   FULL SCREEN BANKING LAYOUT OVERRIDE
+========================================================= */
+body {
+    background:
+        linear-gradient(135deg, rgba(18, 60, 105, 0.10) 0%, rgba(15, 118, 110, 0.08) 38%, rgba(245, 248, 252, 0.95) 38%),
+        linear-gradient(180deg, #eef4f8 0%, #f7fafc 42%, #edf3f7 100%);
+    min-height: 100vh;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 58px 0 auto 0;
+    height: 190px;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg, rgba(18, 60, 105, 0.95), rgba(15, 118, 110, 0.88)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 70px);
+    z-index: -1;
+}
+
+main {
+    width: 100%;
+    padding: clamp(20px, 2.2vw, 38px);
+}
+
+.container,
+.application-wrapper,
+.review-container,
+.dashboard-container {
+    width: 100%;
+    max-width: none;
+}
+
+.review-container,
+.dashboard-container,
+.application-wrapper,
+.container {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+.review-hero,
+.dashboard-topbar,
+.application-topbar {
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(247, 251, 252, 0.94));
+    border: 1px solid rgba(216, 224, 232, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 18px 44px rgba(16, 24, 40, 0.10);
+    padding: clamp(20px, 2vw, 30px);
+}
+
+.review-hero,
+.dashboard-topbar {
+    color: var(--text-dark);
+}
+
+.review-title,
+.dashboard-title,
+.container > h1 {
+    font-size: clamp(32px, 2.8vw, 48px);
+}
+
+.review-subtitle,
+.dashboard-subtitle,
+.subtitle {
+    font-size: clamp(15px, 1vw, 18px);
+}
+
+.review-summary-banner,
+.manager-decision-panel,
+.decision-card,
+.result-panel,
+.dashboard-panel,
+.stat-card,
+.loan-form-card,
+.form-section,
+.progress-strip,
+.application-meta {
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(213, 224, 234, 0.95);
+    border-radius: 10px;
+    box-shadow: 0 16px 40px rgba(16, 24, 40, 0.09);
+}
+
+.review-summary-banner,
+.manager-decision-panel,
+.decision-card {
+    padding: clamp(22px, 2vw, 34px);
+}
+
+.review-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: clamp(18px, 1.6vw, 30px);
+}
+
+.review-grid .dashboard-panel {
+    min-height: 390px;
+    padding: clamp(22px, 1.8vw, 32px);
+}
+
+.summary-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.summary-card {
+    min-height: 92px;
+    padding: 18px;
+}
+
+.summary-card strong {
+    font-size: 18px;
+}
+
+.review-applicant-name {
+    font-size: clamp(28px, 2vw, 38px);
+}
+
+.review-ai-status {
+    font-size: 16px;
+}
+
+.review-badges {
+    gap: 14px;
+}
+
+.risk-badge,
+.status-badge,
+.confidence-badge {
+    padding: 9px 15px;
+    font-size: 14px;
+}
+
+.dashboard-grid {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+}
+
+.stats,
+.dashboard-stats,
+.compact-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stat-card,
+.dashboard-panel,
+.table-panel {
+    padding: clamp(22px, 1.6vw, 30px);
+}
+
+.app-table th,
+.app-table td {
+    padding: 18px 20px;
+}
+
+.form-grid {
+    gap: 20px;
+}
+
+.form-section {
+    padding: clamp(22px, 1.8vw, 32px);
+}
+
+.loan-form-card {
+    padding: clamp(22px, 1.8vw, 32px);
+}
+
+.primary-btn,
+.secondary-btn,
+.action-btn,
+.back-btn,
+.table-review-btn,
+.action-link-btn,
+.submit-btn,
+.approve-btn,
+.reject-btn {
+    min-height: 50px;
+    padding-inline: 22px;
+}
+
+@media (min-width: 1500px) {
+    main {
+        padding: 42px 54px;
+    }
+
+    .review-grid .dashboard-panel {
+        min-height: 440px;
+    }
+
+    .dashboard-panel h3,
+    .result-panel h3,
+    .manager-decision-panel h3 {
+        font-size: 23px;
+    }
+
+    .reason-list li,
+    .dashboard-list li {
+        font-size: 16px;
+        margin-bottom: 12px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1024px) {
+    body::before {
+        height: 150px;
+    }
+
+    .review-grid,
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .review-grid .dashboard-panel {
+        min-height: auto;
+    }
+
+    .stats,
+    .dashboard-stats,
+    .compact-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    body::before {
+        inset: 0 0 auto 0;
+        height: 125px;
+    }
+
+    main {
+        padding: 14px;
+    }
+
+    .review-hero,
+    .dashboard-topbar,
+    .application-topbar {
+        padding: 18px;
+    }
+
+    .summary-grid,
+    .stats,
+    .dashboard-stats,
+    .compact-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================================
+   SINGLE SCREEN COMPACT WORKSPACE OVERRIDE
+========================================================= */
+:root {
+    --page-pad: clamp(12px, 1.4vw, 24px);
+    --panel-pad: clamp(14px, 1.2vw, 22px);
+    --field-height: 44px;
+}
+
+body {
+    font-size: clamp(14px, 0.82vw, 16px);
+    line-height: 1.45;
+    overflow-x: hidden;
+}
+
+body::before {
+    height: 110px;
+}
+
+main {
+    min-height: calc(100vh - 64px);
+    padding: var(--page-pad);
+}
+
+.navbar {
+    min-height: 58px;
+    padding: 8px var(--page-pad);
+}
+
+.brand-mark {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+}
+
+.logo {
+    font-size: clamp(22px, 1.35vw, 28px);
+}
+
+.nav-role {
+    font-size: 11px;
+    margin-top: 1px;
+}
+
+.nav-links a {
+    font-size: 13px;
+    padding: 8px 12px;
+}
+
+.review-hero,
+.dashboard-topbar,
+.application-topbar,
+.review-summary-banner,
+.manager-decision-panel,
+.decision-card,
+.result-panel,
+.dashboard-panel,
+.stat-card,
+.loan-form-card,
+.form-section,
+.progress-strip,
+.application-meta {
+    padding: var(--panel-pad);
+}
+
+.review-title,
+.dashboard-title,
+.container > h1 {
+    font-size: clamp(26px, 2vw, 36px);
+    line-height: 1.08;
+}
+
+.portal-title h2 {
+    font-size: clamp(22px, 1.65vw, 32px);
+}
+
+.review-subtitle,
+.dashboard-subtitle,
+.subtitle,
+.portal-title p,
+.section-header p,
+.decision-subtext,
+.manager-decision-panel p,
+.application-meta,
+.user-meta p,
+.table-meta {
+    font-size: clamp(13px, 0.8vw, 15px);
+}
+
+.dashboard-panel h3,
+.result-panel h3,
+.manager-decision-panel h3,
+.section-header h3 {
+    font-size: clamp(17px, 1.1vw, 22px);
+}
+
+.review-applicant-name {
+    font-size: clamp(22px, 1.6vw, 30px);
+}
+
+.review-ai-status,
+.reason-list li,
+.dashboard-list li,
+.app-table th,
+.app-table td,
+.summary-card strong,
+.form-group label,
+.form-group input,
+.form-group select,
+.form-group textarea,
+.review-box p {
+    font-size: clamp(13px, 0.82vw, 15px);
+}
+
+.summary-label,
+.form-group small {
+    font-size: 11px;
+}
+
+.primary-btn,
+.secondary-btn,
+.action-btn,
+.back-btn,
+.table-review-btn,
+.action-link-btn,
+.submit-btn,
+.approve-btn,
+.reject-btn {
+    min-height: 40px;
+    padding: 9px 15px;
+    font-size: 14px;
+}
+
+.risk-badge,
+.status-badge,
+.confidence-badge {
+    padding: 7px 12px;
+    font-size: 12px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    min-height: var(--field-height);
+    padding: 10px 12px;
+}
+
+.progress-step {
+    min-height: 44px;
+    padding: 8px 10px;
+    font-size: 13px;
+}
+
+.portal-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 14px;
+}
+
+.user-avatar {
+    width: 42px;
+    height: 42px;
+}
+
+.user-meta strong {
+    font-size: 14px;
+}
+
+.stats,
+.dashboard-stats,
+.compact-stats,
+.dashboard-grid,
+.result-sections,
+.form-grid,
+.summary-grid,
+.review-grid {
+    gap: 12px;
+}
+
+.stat-card p {
+    font-size: clamp(26px, 2vw, 38px);
+}
+
+.app-table th,
+.app-table td {
+    padding: 10px 12px;
+}
+
+@media (min-width: 900px) {
+    .review-container {
+        height: calc(100vh - 88px);
+        display: grid;
+        grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+        gap: 10px;
+    }
+
+    .review-hero,
+    .review-summary-banner,
+    .manager-decision-panel,
+    .result-actions {
+        margin: 0;
+    }
+
+    .review-grid {
+        min-height: 0;
+        grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    }
+
+    .review-grid .dashboard-panel {
+        min-height: 0;
+        overflow: auto;
+    }
+
+    .summary-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .summary-card {
+        min-height: 72px;
+        padding: 11px 12px;
+    }
+
+    .review-summary-banner {
+        min-height: 86px;
+    }
+
+    .manager-decision-panel {
+        min-height: 70px;
+    }
+
+    .reason-list li {
+        margin-bottom: 6px;
+    }
+
+    .dashboard-container {
+        min-height: calc(100vh - 88px);
+        display: grid;
+        grid-template-rows: auto auto minmax(0, 1fr) minmax(0, 1.35fr);
+        gap: 12px;
+    }
+
+    .table-panel {
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .table-wrapper {
+        max-height: 100%;
+        overflow: auto;
+    }
+}
+
+.review-summary-banner,
+.dashboard-panel,
+.stat-card,
+.form-section,
+.decision-card,
+.result-panel,
+.manager-decision-panel,
+.loan-form-card {
+    animation: panelEnterCompact 0.28s ease both;
+}
+
+.primary-btn:hover,
+.secondary-btn:hover,
+.action-btn:hover,
+.back-btn:hover,
+.table-review-btn:hover,
+.action-link-btn:hover,
+.submit-btn:hover,
+.approve-btn:hover,
+.reject-btn:hover {
+    transform: translateY(-1px) scale(1.01);
+}
+
+.summary-card:hover,
+.stat-card:hover,
+.dashboard-panel:hover,
+.result-panel:hover {
+    transform: translateY(-2px);
+}
+
+@keyframes panelEnterCompact {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 899px) {
+    .review-container,
+    .dashboard-container {
+        height: auto;
+    }
+
+    .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .summary-grid,
+    .stats,
+    .dashboard-stats,
+    .compact-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================================
+   COLORFUL BANKING THEME
+========================================================= */
+:root {
+    --primary: #2454d6;
+    --primary-dark: #17358e;
+    --primary-soft: #eaf0ff;
+    --accent: #00a88f;
+    --accent-soft: #e2fbf6;
+    --gold: #f59e0b;
+    --rose: #e11d48;
+    --violet: #7c3aed;
+    --cyan: #0284c7;
+}
+
+body {
+    background:
+        radial-gradient(circle at 7% 16%, rgba(36, 84, 214, 0.20), transparent 24%),
+        radial-gradient(circle at 92% 8%, rgba(0, 168, 143, 0.18), transparent 26%),
+        radial-gradient(circle at 78% 86%, rgba(124, 58, 237, 0.14), transparent 28%),
+        linear-gradient(135deg, #f7fbff 0%, #eef6ff 42%, #f6f1ff 100%);
+}
+
+body::before {
+    background:
+        linear-gradient(100deg, rgba(36, 84, 214, 0.96), rgba(0, 168, 143, 0.92) 55%, rgba(124, 58, 237, 0.88)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.14) 0 1px, transparent 1px 74px);
+}
+
+.navbar {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(36, 84, 214, 0.12);
+}
+
+.brand-mark,
+.login-icon,
+.portal-icon,
+.user-avatar {
+    background: linear-gradient(135deg, var(--primary), var(--accent) 60%, var(--violet));
+}
+
+.logo {
+    background: linear-gradient(90deg, var(--primary), var(--accent), var(--violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.nav-links a:hover {
+    background: linear-gradient(135deg, rgba(36, 84, 214, 0.10), rgba(0, 168, 143, 0.10));
+    color: var(--primary-dark);
+}
+
+.review-hero,
+.dashboard-topbar,
+.application-topbar {
+    background:
+        linear-gradient(135deg, rgba(255,255,255,0.96), rgba(234,240,255,0.92)),
+        linear-gradient(90deg, rgba(36,84,214,0.12), rgba(0,168,143,0.10));
+    border-top: 4px solid var(--primary);
+}
+
+.review-summary-banner {
+    background:
+        linear-gradient(135deg, rgba(255,255,255,0.96), rgba(226,251,246,0.76));
+    border-left: 5px solid var(--accent);
+}
+
+.manager-decision-panel {
+    background:
+        linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,247,237,0.82));
+    border-left-color: var(--gold);
+}
+
+.dashboard-panel,
+.result-panel,
+.form-section,
+.loan-form-card,
+.decision-card {
+    background:
+        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,251,255,0.94));
+}
+
+.stat-card:nth-child(1) {
+    background: linear-gradient(135deg, #ffffff, #eef4ff);
+    border-top-color: var(--primary);
+}
+
+.stat-card:nth-child(2) {
+    background: linear-gradient(135deg, #ffffff, #e8fff8);
+    border-top-color: var(--accent);
+}
+
+.stat-card:nth-child(3) {
+    background: linear-gradient(135deg, #ffffff, #fff1f2);
+    border-top-color: var(--rose);
+}
+
+.stat-card:nth-child(4) {
+    background: linear-gradient(135deg, #ffffff, #fff7e6);
+    border-top-color: var(--gold);
+}
+
+.stat-card p {
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.section-header h3,
+.dashboard-panel h3,
+.result-panel h3,
+.manager-decision-panel h3 {
+    color: var(--primary-dark);
+}
+
+.summary-card {
+    background:
+        linear-gradient(135deg, rgba(255,255,255,0.96), rgba(234,240,255,0.72));
+    border-color: rgba(36, 84, 214, 0.14);
+}
+
+.summary-card:nth-child(2n) {
+    background:
+        linear-gradient(135deg, rgba(255,255,255,0.96), rgba(226,251,246,0.72));
+}
+
+.summary-card:nth-child(3n) {
+    background:
+        linear-gradient(135deg, rgba(255,255,255,0.96), rgba(245,243,255,0.78));
+}
+
+.primary-btn,
+.action-btn,
+.back-btn,
+.submit-btn {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+}
+
+.secondary-btn,
+.action-link-btn,
+.table-review-btn {
+    background: linear-gradient(135deg, #ffffff, #edf7ff);
+    border-color: rgba(36, 84, 214, 0.22);
+}
+
+.approve-btn {
+    background: linear-gradient(135deg, #00a88f, #047857);
+}
+
+.reject-btn {
+    background: linear-gradient(135deg, #f43f5e, #be123c);
+}
+
+.risk-low,
+.status-approved {
+    background: #dcfce7;
+    color: #166534;
+    border-color: #86efac;
+}
+
+.risk-medium,
+.status-pending {
+    background: #fff7d6;
+    color: #92400e;
+    border-color: #facc15;
+}
+
+.risk-high,
+.status-rejected {
+    background: #ffe4e6;
+    color: #9f1239;
+    border-color: #fda4af;
+}
+
+.confidence-badge {
+    background: #ede9fe;
+    color: #5b21b6;
+    border-color: #c4b5fd;
+}
+
+.app-table th {
+    background: linear-gradient(90deg, #eaf0ff, #e2fbf6);
+}
+
+.app-table tbody tr:hover {
+    background: linear-gradient(90deg, rgba(36,84,214,0.06), rgba(0,168,143,0.06));
+}
+
+.auto-note {
+    background: linear-gradient(135deg, #e2fbf6, #ecfeff);
+    border-color: rgba(0, 168, 143, 0.28);
+}
+
+.progress-step.active {
+    background: linear-gradient(135deg, #eaf0ff, #eef2ff);
+    border-color: rgba(36, 84, 214, 0.28);
+}
+
+.progress-step.completed {
+    background: linear-gradient(135deg, #e2fbf6, #ecfdf5);
+    border-color: rgba(0, 168, 143, 0.28);
+}
+
+/* =========================================================
+   EXTRA COLOR + SYMBOL SYSTEM
+========================================================= */
+body {
+    background:
+        linear-gradient(120deg, rgba(36, 84, 214, 0.13) 0 18%, transparent 18% 100%),
+        linear-gradient(300deg, rgba(0, 168, 143, 0.14) 0 16%, transparent 16% 100%),
+        linear-gradient(40deg, transparent 0 72%, rgba(245, 158, 11, 0.14) 72% 84%, transparent 84%),
+        linear-gradient(135deg, #f7fbff 0%, #edf7ff 38%, #f7f0ff 72%, #fff8ed 100%);
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 58px 0 auto 0;
+    height: 10px;
+    pointer-events: none;
+    background: linear-gradient(90deg, var(--primary), var(--accent), var(--gold), var(--violet), var(--rose));
+    z-index: -1;
+}
+
+.review-hero,
+.dashboard-topbar,
+.application-topbar {
+    position: relative;
+    overflow: hidden;
+}
+
+.review-hero::after,
+.dashboard-topbar::after,
+.application-topbar::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto auto;
+    width: 38%;
+    height: 100%;
+    background:
+        linear-gradient(135deg, transparent 0 24%, rgba(36, 84, 214, 0.08) 24% 38%, transparent 38%),
+        linear-gradient(135deg, transparent 0 45%, rgba(0, 168, 143, 0.10) 45% 58%, transparent 58%),
+        linear-gradient(135deg, transparent 0 68%, rgba(245, 158, 11, 0.10) 68% 78%, transparent 78%);
+    pointer-events: none;
+}
+
+.dashboard-panel,
+.result-panel,
+.form-section,
+.summary-card,
+.stat-card,
+.manager-decision-panel,
+.review-summary-banner {
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-panel::before,
+.result-panel::before,
+.form-section::before,
+.manager-decision-panel::before,
+.review-summary-banner::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: linear-gradient(180deg, var(--primary), var(--accent), var(--violet));
+}
+
+.dashboard-panel:nth-child(2)::before,
+.result-panel:nth-child(2)::before {
+    background: linear-gradient(180deg, var(--gold), var(--rose), var(--violet));
+}
+
+.stat-card::before {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 900;
+    box-shadow: 0 10px 22px rgba(16, 24, 40, 0.14);
+}
+
+.stat-card:nth-child(1)::before {
+    content: "\25C8";
+    background: linear-gradient(135deg, var(--primary), var(--cyan));
+}
+
+.stat-card:nth-child(2)::before {
+    content: "\2713";
+    background: linear-gradient(135deg, var(--accent), #16a34a);
+}
+
+.stat-card:nth-child(3)::before {
+    content: "\2715";
+    background: linear-gradient(135deg, var(--rose), #be123c);
+}
+
+.stat-card:nth-child(4)::before {
+    content: "\25D4";
+    background: linear-gradient(135deg, var(--gold), #f97316);
+}
+
+.dashboard-panel h3,
+.result-panel h3,
+.section-header h3,
+.manager-decision-panel h3 {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.dashboard-panel h3::before,
+.result-panel h3::before,
+.section-header h3::before,
+.manager-decision-panel h3::before {
+    content: "\25C6";
+    width: 24px;
+    height: 24px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 7px;
+    color: #fff;
+    font-size: 12px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    box-shadow: 0 8px 16px rgba(36, 84, 214, 0.18);
+}
+
+.dashboard-panel:nth-child(2) h3::before,
+.result-panel:nth-child(2) h3::before {
+    content: "\2726";
+    background: linear-gradient(135deg, var(--gold), var(--rose));
+}
+
+.manager-decision-panel h3::before {
+    content: "\2696";
+    background: linear-gradient(135deg, var(--gold), var(--violet));
+}
+
+.status-badge::before,
+.risk-badge::before,
+.confidence-badge::before {
+    margin-right: 6px;
+    font-weight: 900;
+}
+
+.status-approved::before,
+.risk-low::before {
+    content: "\2713";
+}
+
+.status-rejected::before,
+.risk-high::before {
+    content: "\2715";
+}
+
+.status-pending::before,
+.risk-medium::before {
+    content: "\25D4";
+}
+
+.confidence-badge::before {
+    content: "\25C9";
+}
+
+.nav-links a::before {
+    content: "\25B8";
+    margin-right: 6px;
+    color: var(--accent);
+}
+
+.primary-btn::before,
+.submit-btn::before,
+.action-btn::before,
+.back-btn::before {
+    content: "\2192";
+    font-weight: 900;
+}
+
+.secondary-btn::before,
+.action-link-btn::before,
+.table-review-btn::before {
+    content: "\25B8";
+    font-weight: 900;
+}
+
+.approve-btn::before {
+    content: "\2713";
+    margin-right: 8px;
+}
+
+.reject-btn::before {
+    content: "\2715";
+    margin-right: 8px;
+}
+
+.summary-label::before {
+    content: "\25A0";
+    margin-right: 6px;
+    color: var(--accent);
+    font-size: 9px;
+}
+
+.reason-list li::marker {
+    color: var(--primary);
+}
+
+.reason-list li:nth-child(2n)::marker {
+    color: var(--accent);
+}
+
+.reason-list li:nth-child(3n)::marker {
+    color: var(--gold);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    background:
+        linear-gradient(#fff, #fff) padding-box,
+        linear-gradient(90deg, var(--primary), var(--accent), var(--violet)) border-box;
+    border: 1px solid transparent;
+}
+
+/* Real CreditLens logo */
+.brand-logo-img,
+.portal-logo-img,
+.login-logo-img {
+    object-fit: contain;
+    object-position: center;
+    background: transparent;
+    border: none;
+    box-shadow: 0 8px 18px rgba(16, 24, 40, 0.10);
+}
+
+.brand-logo-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 11px;
+    padding: 0;
+}
+
+.portal-logo-img {
+    width: 62px;
+    height: 62px;
+    border-radius: 12px;
+    padding: 0;
+}
+
+.login-logo-img {
+    width: min(170px, 58%);
+    height: auto;
+    display: block;
+    margin: 0 auto 12px;
+    border-radius: 14px;
+    padding: 0;
+    object-fit: contain;
+    box-shadow: 0 10px 24px rgba(16, 24, 40, 0.12);
+    background: transparent;
+    border: none;
+}
+
+.login-card {
+    text-align: center;
+}
+
+.login-form,
+.login-footer {
+    text-align: left;
+}
+
+@media (max-width: 640px) {
+    .brand-logo-img {
+        width: 42px;
+        height: 42px;
+    }
+
+    .portal-logo-img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .login-logo-img {
+        width: min(145px, 56%);
+        height: auto;
+    }
+}
+
+/* Dashboard table visual chips */
+.app-table td:first-child {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+}
+
+.applicant-chip {
+    width: 34px;
+    height: 34px;
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border-radius: 9px;
+    color: #fff;
+    font-weight: 900;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    box-shadow: 0 8px 16px rgba(36, 84, 214, 0.18);
+}
+
+.ml-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 118px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 900;
+    border: 1px solid transparent;
+}
+
+.ml-badge::before {
+    font-weight: 900;
+}
+
+.ml-approved {
+    color: #065f46;
+    background: linear-gradient(135deg, #dcfce7, #ccfbf1);
+    border-color: #86efac;
+}
+
+.ml-approved::before {
+    content: "\2713";
+}
+
+.ml-rejected {
+    color: #9f1239;
+    background: linear-gradient(135deg, #ffe4e6, #fff1f2);
+    border-color: #fda4af;
+}
+
+.ml-rejected::before {
+    content: "\2715";
+}
+
+.ml-pending {
+    color: #92400e;
+    background: linear-gradient(135deg, #fff7d6, #ffedd5);
+    border-color: #facc15;
+}
+
+.ml-pending::before {
+    content: "\25D4";
+}
+
+.app-table tbody td:nth-child(1) {
+    background: linear-gradient(90deg, rgba(36, 84, 214, 0.035), transparent);
+}
+
+.app-table tbody td:nth-child(3) {
+    background: linear-gradient(90deg, rgba(0, 168, 143, 0.045), transparent);
+}
+
+/* Final logo blend fix: make logo feel native to the header */
+.brand-logo-img,
+.portal-logo-img {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    mix-blend-mode: multiply;
+}
+
+.brand-logo-img {
+    width: 88px;
+    height: 88px;
+}
+
+.brand-lockup {
+    gap: 18px;
+}
+
+.navbar {
+    min-height: 66px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.logo {
+    font-size: clamp(34px, 2.1vw, 44px);
+    line-height: 1;
+}
+
+.nav-role {
+    font-size: 15px;
+    margin-top: 5px;
+}
+
+.nav-links a {
+    font-size: 18px;
+    padding: 12px 18px;
+}
+
+.portal-logo-img {
+    width: 96px;
+    height: 96px;
+}
+
+.portal-title {
+    gap: 22px;
+}
+
+.brand-lockup,
+.portal-title {
+    background: transparent;
+}
+
+/* Login logo compact blend */
+.login-logo-img {
+    width: min(135px, 46%) !important;
+    height: auto !important;
+    margin: 0 auto 4px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    mix-blend-mode: multiply;
+}
+
+.login-title {
+    margin-top: 0 !important;
+    margin-bottom: 2px !important;
+}
+
+.login-subtitle {
+    margin-top: 0 !important;
+    margin-bottom: 24px !important;
+}
+
+@media (max-width: 640px) {
+    .login-logo-img {
+        width: min(118px, 44%) !important;
+    }
+
+    .brand-logo-img {
+        width: 66px;
+        height: 66px;
+    }
+
+    .portal-logo-img {
+        width: 72px;
+        height: 72px;
+    }
+}
