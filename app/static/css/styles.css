@@ -1024,7 +1024,7 @@ h1, h2, h3, h4 {
     min-width: 120px;
 }
 
-/* ========== RESPONSIVE ========== */
+/* ========== RESPONSIVE ============== */
 @media (max-width: 1024px) {
     .stats,
     .dashboard-stats,
