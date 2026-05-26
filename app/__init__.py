@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from app.database.db import db
 
@@ -9,11 +10,19 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///CreditLens.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+    # Email settings (use environment variables in production)
+    app.config["EMAIL_HOST"] = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
+    app.config["EMAIL_PORT"] = int(os.environ.get("EMAIL_PORT", 465))
+    app.config["EMAIL_USE_SSL"] = os.environ.get("EMAIL_USE_SSL", "True").lower() in ("1", "true", "yes")
+    app.config["EMAIL_HOST_USER"] = os.environ.get("EMAIL_HOST_USER", "")
+    app.config["EMAIL_HOST_PASSWORD"] = os.environ.get("EMAIL_HOST_PASSWORD", "")
+    app.config["EMAIL_SENDER"] = os.environ.get("EMAIL_SENDER", "noreply@creditlens.com")
+
     # Initialize database
     db.init_app(app)
 
     # Import models so SQLAlchemy knows about them
-    from app.database.db import User, Application, Prediction
+    from app.database.db import User, Application, Prediction, EmailVerification
 
     # Create tables + seed demo users if they don't exist
     with app.app_context():

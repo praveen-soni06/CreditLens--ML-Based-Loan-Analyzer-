@@ -1,12 +1,17 @@
-from flask import Blueprint, render_template, request, session, redirect, url_for
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
 
+from flask import Blueprint, render_template, request, session, redirect, url_for
 import joblib
 import pandas as pd
 
-from app.database.db import db, Application, Prediction
+from app.database.db import db, Application, Prediction, EmailVerification
+from app.utils.email_utils import (
+    generate_verification_code,
+    send_verification_code_email,
+    send_decision_notification_email,
+)
 
 predict_bp = Blueprint('predict', __name__)
 
@@ -58,9 +63,45 @@ def require_loan_assistant():
     return None
 
 
-@lru_cache(maxsize=1)
-def load_ml_artifacts():
-    return joblib.load(MODEL_PATH), joblib.load(SCALER_PATH)
+def get_prediction_notes(result, risk_level, confidence_score, credit_score,
+                         previous_loan_defaults_on_file, loan_percent_income,
+                         person_emp_exp, person_income):
+    reasons = [
+        f"ML model predicted {result.lower()} with {confidence_score:.0%} confidence."
+    ]
+    suggestions = []
+
+    if credit_score < 600:
+        reasons.append("Credit score is below the preferred lending threshold.")
+        suggestions.append("Improve credit score by maintaining timely repayments.")
+
+    if previous_loan_defaults_on_file == 1:
+        reasons.append("Previous loan default history increases repayment risk.")
+        suggestions.append("Provide stronger financial documents and repayment evidence.")
+
+    if loan_percent_income > 0.5:
+        reasons.append("Loan amount is relatively high compared to annual income.")
+        suggestions.append("Consider reducing the loan amount for better eligibility.")
+
+    if person_emp_exp < 1 and person_income < 300000:
+        reasons.append("Limited work experience may reduce repayment stability.")
+        suggestions.append("Provide employment proof or add a stronger income profile.")
+
+    if result == "Approved" and not suggestions:
+        suggestions = [
+            "Ensure all submitted documents match the declared values.",
+            "Maintain repayment discipline for future credit strength."
+        ]
+
+    if result == "Rejected" and not suggestions:
+        suggestions = [
+            "Review your financial profile and apply again after improving key risk factors."
+        ]
+
+    if risk_level == "Medium":
+        suggestions.append("Send this application for manager review before final approval.")
+
+    return reasons, suggestions
 
 
 def get_age_group_value(age):
@@ -140,47 +181,6 @@ def build_model_input(
     return pd.DataFrame([[feature_values[column] for column in FEATURE_COLUMNS]], columns=FEATURE_COLUMNS)
 
 
-def get_prediction_notes(result, risk_level, confidence_score, credit_score,
-                         previous_loan_defaults_on_file, loan_percent_income,
-                         person_emp_exp, person_income):
-    reasons = [
-        f"ML model predicted {result.lower()} with {confidence_score:.0%} confidence."
-    ]
-    suggestions = []
-
-    if credit_score < 600:
-        reasons.append("Credit score is below the preferred lending threshold.")
-        suggestions.append("Improve credit score by maintaining timely repayments.")
-
-    if previous_loan_defaults_on_file == 1:
-        reasons.append("Previous loan default history increases repayment risk.")
-        suggestions.append("Provide stronger financial documents and repayment evidence.")
-
-    if loan_percent_income > 0.5:
-        reasons.append("Loan amount is relatively high compared to annual income.")
-        suggestions.append("Consider reducing the loan amount for better eligibility.")
-
-    if person_emp_exp < 1 and person_income < 300000:
-        reasons.append("Limited work experience may reduce repayment stability.")
-        suggestions.append("Provide employment proof or add a stronger income profile.")
-
-    if result == "Approved" and not suggestions:
-        suggestions = [
-            "Ensure all submitted documents match the declared values.",
-            "Maintain repayment discipline for future credit strength."
-        ]
-
-    if result == "Rejected" and not suggestions:
-        suggestions = [
-            "Review your financial profile and apply again after improving key risk factors."
-        ]
-
-    if risk_level == "Medium":
-        suggestions.append("Send this application for manager review before final approval.")
-
-    return reasons, suggestions
-
-
 @predict_bp.route('/application')
 def application():
     guard = require_loan_assistant()
@@ -195,6 +195,152 @@ def application():
         current_date=current_date,
         application_ref=application_ref
     )
+
+
+@lru_cache(maxsize=1)
+def load_ml_artifacts():
+    return joblib.load(MODEL_PATH), joblib.load(SCALER_PATH)
+
+
+def finalize_prediction(application):
+    model, scaler = load_ml_artifacts()
+    model_input = build_model_input(
+        person_age=application.person_age,
+        person_gender=application.person_gender,
+        person_education=application.person_education,
+        person_income=application.person_income,
+        person_emp_exp=application.person_emp_exp,
+        person_home_ownership=application.person_home_ownership,
+        loan_amnt=application.loan_amnt,
+        loan_intent=application.loan_intent,
+        loan_int_rate=application.loan_int_rate,
+        loan_percent_income=application.loan_percent_income,
+        credit_history_length=application.credit_history_length,
+        credit_score=application.credit_score,
+        previous_loan_defaults_on_file=application.previous_loan_defaults_on_file,
+    )
+    scaled_input = scaler.transform(model_input)
+    ml_decision = int(model.predict(scaled_input)[0])
+
+    if hasattr(model, 'predict_proba'):
+        probabilities = model.predict_proba(scaled_input)[0]
+        classes = list(model.classes_)
+        confidence_score = float(probabilities[classes.index(ml_decision)])
+    else:
+        confidence_score = 0.75
+
+    result = "Approved" if ml_decision == 1 else "Rejected"
+    if result == "Rejected":
+        risk_level = "High"
+    elif confidence_score >= 0.75:
+        risk_level = "Low"
+    else:
+        risk_level = "Medium"
+
+    reasons, suggestions = get_prediction_notes(
+        result=result,
+        risk_level=risk_level,
+        confidence_score=confidence_score,
+        credit_score=application.credit_score,
+        previous_loan_defaults_on_file=application.previous_loan_defaults_on_file,
+        loan_percent_income=application.loan_percent_income,
+        person_emp_exp=application.person_emp_exp,
+        person_income=application.person_income,
+    )
+
+    email_needed = False
+    final_decision = "pending"
+    decision_at_value = None
+    flag = "review"
+
+    if risk_level != "Medium":
+        flag = "clear"
+        final_decision = result.lower()
+        decision_at_value = datetime.utcnow()
+        email_needed = True
+
+    new_prediction = Prediction(
+        application_id=application.id,
+        ml_decision=ml_decision,
+        confidence_score=confidence_score,
+        flag=flag,
+        final_decision=final_decision,
+        decided_by=None,
+        decision_at=decision_at_value,
+        email_sent=0,
+        predicted_at=datetime.utcnow()
+    )
+
+    db.session.add(new_prediction)
+    db.session.commit()
+
+    if email_needed:
+        send_decision_notification_email(
+            customer_name=application.customer_name,
+            customer_email=application.customer_email,
+            result=result,
+            reasons=reasons,
+            suggestions=suggestions
+        )
+        new_prediction.email_sent = 1
+        db.session.commit()
+
+    return {
+        'result': result,
+        'reasons': reasons,
+        'suggestions': suggestions,
+        'risk_level': risk_level,
+        'application_id': application.id,
+        'applicant_name': application.customer_name,
+        'prediction': new_prediction
+    }
+
+
+@predict_bp.route('/verify-email/<int:application_id>', methods=['GET', 'POST'])
+def verify_email(application_id):
+    guard = require_loan_assistant()
+    if guard:
+        return guard
+
+    verification = EmailVerification.query.filter_by(application_id=application_id).first_or_404()
+    application = verification.application
+    error = None
+
+    if request.method == 'POST':
+        code = request.form.get('verification_code', '').strip()
+
+        if verification.verified:
+            return redirect(url_for('predict.application'))
+
+        if datetime.utcnow() > verification.expires_at:
+            error = 'The verification code has expired. Please resubmit the application to receive a new code.'
+        elif code != verification.verification_code:
+            verification.attempts += 1
+            db.session.commit()
+            error = 'The code is incorrect. Please check your email and try again.'
+        else:
+            verification.verified = True
+            db.session.commit()
+            result_data = finalize_prediction(application)
+            return render_template(
+                'result.html',
+                result=result_data['result'],
+                reasons=result_data['reasons'],
+                suggestions=result_data['suggestions'],
+                risk_level=result_data['risk_level'],
+                applicant_name=result_data['applicant_name'],
+                application_id=result_data['application_id']
+            )
+
+    return render_template(
+        'verify_email.html',
+        application_id=application_id,
+        customer_email=application.customer_email,
+        customer_name=application.customer_name,
+        error=error
+    )
+
+
 @predict_bp.route('/predict', methods=['POST'])
 def predict():
     guard = require_loan_assistant()
@@ -202,9 +348,6 @@ def predict():
         return guard
 
     try:
-        # -----------------------------
-        # Read form fields
-        # -----------------------------
         customer_name = request.form.get('customer_name', '').strip()
         customer_email = request.form.get('customer_email', '').strip()
 
@@ -237,69 +380,6 @@ def predict():
             application_id=None
         )
 
-    # -----------------------------
-    # Real ML model prediction
-    # -----------------------------
-    try:
-        model, scaler = load_ml_artifacts()
-        model_input = build_model_input(
-            person_age=person_age,
-            person_gender=person_gender,
-            person_education=person_education,
-            person_income=person_income,
-            person_emp_exp=person_emp_exp,
-            person_home_ownership=person_home_ownership,
-            loan_amnt=loan_amnt,
-            loan_intent=loan_intent,
-            loan_int_rate=loan_int_rate,
-            loan_percent_income=loan_percent_income,
-            credit_history_length=credit_history_length,
-            credit_score=credit_score,
-            previous_loan_defaults_on_file=previous_loan_defaults_on_file,
-        )
-        scaled_input = scaler.transform(model_input)
-        ml_decision = int(model.predict(scaled_input)[0])
-
-        if hasattr(model, 'predict_proba'):
-            probabilities = model.predict_proba(scaled_input)[0]
-            classes = list(model.classes_)
-            confidence_score = float(probabilities[classes.index(ml_decision)])
-        else:
-            confidence_score = 0.75
-
-        result = "Approved" if ml_decision == 1 else "Rejected"
-        if result == "Rejected":
-            risk_level = "High"
-        elif confidence_score >= 0.75:
-            risk_level = "Low"
-        else:
-            risk_level = "Medium"
-
-        reasons, suggestions = get_prediction_notes(
-            result=result,
-            risk_level=risk_level,
-            confidence_score=confidence_score,
-            credit_score=credit_score,
-            previous_loan_defaults_on_file=previous_loan_defaults_on_file,
-            loan_percent_income=loan_percent_income,
-            person_emp_exp=person_emp_exp,
-            person_income=person_income,
-        )
-
-    except Exception as e:
-        return render_template(
-            'result.html',
-            result="Rejected",
-            reasons=[f"ML prediction error: {str(e)}"],
-            suggestions=["Check that ML/model.pkl and ML/scaler.pkl exist and match the training feature columns."],
-            risk_level="High",
-            applicant_name=customer_name if customer_name else "Applicant",
-            application_id=None
-        )
-
-    # -----------------------------
-    # Save application + prediction
-    # -----------------------------
     try:
         new_application = Application(
             loan_assistant_id=session.get('user_id'),
@@ -320,35 +400,32 @@ def predict():
             previous_loan_defaults_on_file=previous_loan_defaults_on_file,
             submitted_at=datetime.utcnow()
         )
-
         db.session.add(new_application)
         db.session.commit()
 
-        if risk_level == "Medium":
-            flag = "review"
-            final_decision = "pending"
-            decided_by = None
-            decision_at_value = None
-        else:
-            flag = "clear"
-            final_decision = result.lower()
-            decided_by = None
-            decision_at_value = datetime.utcnow()
-
-        new_prediction = Prediction(
+        code = generate_verification_code()
+        verification = EmailVerification(
             application_id=new_application.id,
-            ml_decision=ml_decision,
-            confidence_score=confidence_score,
-            flag=flag,
-            final_decision=final_decision,
-            decided_by=decided_by,
-            decision_at=decision_at_value,
-            email_sent=0,
-            predicted_at=datetime.utcnow()
+            verification_code=code,
+            expires_at=datetime.utcnow() + timedelta(minutes=15),
+            verified=False,
+            attempts=0
         )
-
-        db.session.add(new_prediction)
+        db.session.add(verification)
         db.session.commit()
+
+        try:
+            send_verification_code_email(customer_name, customer_email, code)
+        except Exception as e:
+            return render_template(
+                'result.html',
+                result="Rejected",
+                reasons=["Failed to send verification email.", str(e)],
+                suggestions=["Verify SMTP settings and email credentials.", "Try again later."],
+                risk_level="High",
+                applicant_name=customer_name if customer_name else "Applicant",
+                application_id=new_application.id
+            )
 
     except Exception as e:
         db.session.rollback()
@@ -362,15 +439,10 @@ def predict():
             application_id=None
         )
 
-    # -----------------------------
-    # Success result page
-    # -----------------------------
     return render_template(
-        'result.html',
-        result=result,
-        reasons=reasons,
-        suggestions=suggestions,
-        risk_level=risk_level,
-        applicant_name=customer_name if customer_name else "Applicant",
-        application_id=new_application.id
+        'verify_email.html',
+        application_id=new_application.id,
+        customer_email=customer_email,
+        customer_name=customer_name,
+        error=None
     )

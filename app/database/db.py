@@ -58,6 +58,17 @@ class Application(db.Model):
     submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     prediction = db.relationship('Prediction', backref='application', uselist=False)
+    verification = db.relationship('EmailVerification', backref='application', uselist=False)
+
+class EmailVerification(db.Model):
+    __tablename__ = 'email_verifications'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    application_id = db.Column(db.Integer, db.ForeignKey('applications.id'), nullable=False)
+    verification_code = db.Column(db.String(12), nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    verified = db.Column(db.Boolean, nullable=False, default=False)
+    attempts = db.Column(db.Integer, nullable=False, default=0)
 
 class Prediction(db.Model):
     __tablename__ = 'predictions'

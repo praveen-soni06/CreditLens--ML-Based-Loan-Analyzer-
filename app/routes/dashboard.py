@@ -3,6 +3,8 @@ from datetime import datetime
 from flask import Blueprint, render_template, redirect, request, session, url_for
 
 from app.database.db import Application, Prediction, db
+from app.routes.predict import get_prediction_notes
+from app.utils.email_utils import send_decision_notification_email
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
@@ -200,7 +202,32 @@ def decide_application(application_id):
     prediction.final_decision = decision
     prediction.decided_by = session.get('user_id')
     prediction.decision_at = datetime.utcnow()
-
     db.session.commit()
+
+    try:
+        if prediction.email_sent == 0:
+            application = Application.query.get(application_id)
+            if application:
+                reasons, suggestions = get_prediction_notes(
+                    result=decision.capitalize(),
+                    risk_level="High" if decision == "rejected" else "Low",
+                    confidence_score=prediction.confidence_score or 0.75,
+                    credit_score=application.credit_score,
+                    previous_loan_defaults_on_file=application.previous_loan_defaults_on_file,
+                    loan_percent_income=application.loan_percent_income,
+                    person_emp_exp=application.person_emp_exp,
+                    person_income=application.person_income,
+                )
+                send_decision_notification_email(
+                    customer_name=application.customer_name,
+                    customer_email=application.customer_email,
+                    result=decision.capitalize(),
+                    reasons=reasons,
+                    suggestions=suggestions
+                )
+                prediction.email_sent = 1
+                db.session.commit()
+    except Exception:
+        pass
 
     return redirect(url_for('dashboard.review', application_id=application_id))

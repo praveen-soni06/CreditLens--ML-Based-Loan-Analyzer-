@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Your Email | CreditLens{% endblock %}
+
+{% block content %}
+<div class="container verify-container">
+    <div class="verify-card">
+        <h1>Email Verification</h1>
+        <p>A verification code has been sent to <strong>{{ customer_email }}</strong>. Enter the code below to confirm the application and continue.</p>
+
+        {% if error %}
+            <div class="alert alert-error">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('predict.verify_email', application_id=application_id) }}" class="verify-form">
+            <div class="form-group">
+                <label>Verification Code</label>
+                <input type="text" name="verification_code" placeholder="Enter 6-digit code" maxlength="6" required>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="primary-btn">Verify Email</button>
+                <a href="{{ url_for('predict.application') }}" class="secondary-btn">Start Over</a>
+            </div>
+        </form>
+
+        <p class="verify-note">If you do not receive the email in a few minutes, please check your spam folder and try again. For improved delivery, use a valid personal or business email address.</p>
+    </div>
+</div>
+{% endblock %}

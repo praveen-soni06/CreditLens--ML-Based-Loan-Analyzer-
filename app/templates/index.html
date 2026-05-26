@@ -9,7 +9,6 @@
             <img class="portal-logo-img" src="{{ url_for('static', filename='images/creditlens-logo.png') }}" alt="CreditLens logo">
             <div>
                 <h2>CreditLens - Credit Underwriting Portal</h2>
-                <p>Loan application intake for ML-based credit decisioning</p>
             </div>
         </div>
 
@@ -40,20 +39,17 @@
             <section class="form-section">
                 <div class="section-header">
                     <h3>Personal Details</h3>
-                    <p>Basic customer information</p>
                 </div>
 
                 <div class="form-grid two-col">
                     <div class="form-group">
                         <label>Customer Full Name <span class="required">*</span></label>
                         <input type="text" name="customer_name" placeholder="e.g. Amit Kumar" required>
-                        <small>As per government ID</small>
                     </div>
 
                     <div class="form-group">
                         <label>Customer Email <span class="required">*</span></label>
                         <input type="email" name="customer_email" placeholder="e.g. amit@email.com" required>
-                        <small>Result notification will be sent here</small>
                     </div>
                 </div>
 
@@ -61,7 +57,6 @@
                     <div class="form-group">
                         <label>Age <span class="required">*</span></label>
                         <input type="number" name="person_age" placeholder="e.g. 28" min="18" max="80" required>
-                        <small>person_age</small>
                     </div>
 
                     <div class="form-group">
@@ -71,7 +66,6 @@
                             <option value="1">Male</option>
                             <option value="0">Female</option>
                         </select>
-                        <small>person_gender</small>
                     </div>
 
                     <div class="form-group">
@@ -84,7 +78,6 @@
                             <option value="Master">Master</option>
                             <option value="Doctorate">Doctorate</option>
                         </select>
-                        <small>person_education</small>
                     </div>
                 </div>
             </section>
@@ -105,13 +98,11 @@
                     <div class="form-group">
                         <label>Annual Income (INR) <span class="required">*</span></label>
                         <input type="number" name="person_income" placeholder="e.g. 600000" min="0" step="0.01" required>
-                        <small>person_income</small>
                     </div>
 
                     <div class="form-group">
                         <label>Employment Experience (Years) <span class="required">*</span></label>
                         <input type="number" name="person_emp_exp" placeholder="e.g. 3" min="0" step="1" required>
-                        <small>person_emp_exp</small>
                     </div>
 
                     <div class="form-group">
@@ -123,7 +114,6 @@
                             <option value="MORTGAGE">Mortgage</option>
                             <option value="OTHER">Other</option>
                         </select>
-                        <small>person_home_ownership</small>
                     </div>
                 </div>
             </section>
@@ -138,13 +128,11 @@
                     <div class="form-group">
                         <label>Credit Score <span class="required">*</span></label>
                         <input type="number" name="credit_score" placeholder="e.g. 680" min="300" max="900" required>
-                        <small>credit_score (300-900)</small>
                     </div>
 
                     <div class="form-group">
                         <label>Credit History Length <span class="required">*</span></label>
                         <input type="number" name="credit_history_length" placeholder="e.g. 4" min="0" step="0.1" required>
-                        <small>credit_history_length (years)</small>
                     </div>
 
                     <div class="form-group">
@@ -154,7 +142,6 @@
                             <option value="0">No</option>
                             <option value="1">Yes</option>
                         </select>
-                        <small>previous_loan_defaults_on_file</small>
                     </div>
                 </div>
             </section>
@@ -169,13 +156,11 @@
                     <div class="form-group">
                         <label>Loan Amount (INR) <span class="required">*</span></label>
                         <input type="number" name="loan_amnt" placeholder="e.g. 200000" min="0" step="0.01" required>
-                        <small>loan_amnt</small>
                     </div>
 
                     <div class="form-group">
                         <label>Interest Rate (%) <span class="required">*</span></label>
                         <input type="number" name="loan_int_rate" placeholder="e.g. 10.5" min="0" step="0.01" required>
-                        <small>loan_int_rate</small>
                     </div>
 
                     <div class="form-group">
@@ -189,7 +174,6 @@
                             <option value="VENTURE">Business / Venture</option>
                             <option value="DEBTCONSOLIDATION">Debt Consolidation</option>
                         </select>
-                        <small>loan_intent</small>
                     </div>
                 </div>
 
