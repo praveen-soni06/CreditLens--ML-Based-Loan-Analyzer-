@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Application Status | CreditLens{% endblock %}
+
+{% block content %}
+<div class="tracking-shell tracking-status-shell">
+    <section class="tracking-status-card glass-panel">
+        <div class="tracking-status-hero">
+            <div>
+                <span class="eyebrow">Loan Application Tracker</span>
+                <h1>{{ application.application_ref }}</h1>
+                <p>Track the current stage of your CreditLens loan application.</p>
+            </div>
+            <div class="public-status-pill status-{{ status_tone }}">{{ public_status }}</div>
+        </div>
+
+        <div class="tracking-record-block">
+            <div class="tracking-progress-top">
+                <span>Latest bank record</span>
+                <strong>{{ event_count }} status update{% if event_count != 1 %}s{% endif %}</strong>
+            </div>
+            <p>
+                {{ latest_update.label }}
+                {% if latest_update.date %}
+                <span>{{ latest_update.date.strftime('%d %b %Y, %I:%M %p') }}</span>
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="customer-tracking-grid">
+            <div class="tracking-info-card">
+                <span>Applicant</span>
+                <strong>{{ application.customer_name }}</strong>
+                <small>{{ masked_email }}</small>
+            </div>
+            <div class="tracking-info-card">
+                <span>Loan Purpose</span>
+                <strong>{{ application.loan_intent|replace('_', ' ')|title }}</strong>
+                <small>From application record</small>
+            </div>
+            <div class="tracking-info-card">
+                <span>Submitted On</span>
+                <strong>{{ application.submitted_at.strftime('%d %b %Y') if application.submitted_at else 'Not available' }}</strong>
+                <small>{{ application.submitted_at.strftime('%I:%M %p') if application.submitted_at else '' }}</small>
+            </div>
+            <div class="tracking-info-card">
+                <span>Last Updated</span>
+                <strong>{{ application.status_updated_at.strftime('%d %b %Y') if application.status_updated_at else 'Not available' }}</strong>
+                <small>{{ application.status_updated_at.strftime('%I:%M %p') if application.status_updated_at else '' }}</small>
+            </div>
+        </div>
+
+        <div class="tracking-status-layout">
+            <div class="customer-timeline-panel">
+                <div class="panel-heading">
+                    <h3>Application Journey</h3>
+                    <span>Customer view</span>
+                </div>
+                <div class="customer-timeline">
+                    {% for step in timeline %}
+                    <div class="customer-timeline-step {% if step.completed %}completed{% endif %} {% if step.active %}active{% endif %}">
+                        <div class="customer-timeline-marker"></div>
+                        <div>
+                            <strong>{{ step.label }}</strong>
+                            <p>{{ step.description }}</p>
+                            {% if step.date %}
+                            <small>{{ step.date.strftime('%d %b %Y, %I:%M %p') }}</small>
+                            {% elif step.active %}
+                            <small>In progress</small>
+                            {% else %}
+                            <small>Recorded update</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <aside class="tracking-next-panel">
+                <span class="eyebrow">What Happens Next</span>
+                <h2>{{ public_status }}</h2>
+                <p>Your tracker is showing the latest status saved by the bank. New updates will appear here after the bank records the next action.</p>
+                <div class="tracking-note-box">
+                    <strong>Privacy Protected</strong>
+                    <span>Internal risk scores, underwriting confidence, and admin notes are only visible to authorized bank staff.</span>
+                </div>
+                <a href="{{ url_for('tracking.track_application') }}" class="secondary-btn">Track Another Application</a>
+            </aside>
+        </div>
+    </section>
+</div>
+{% endblock %}

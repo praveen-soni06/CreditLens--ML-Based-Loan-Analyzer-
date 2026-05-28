@@ -1,145 +1,374 @@
 {% extends "base.html" %}
 
-{% block title %}Application Review{% endblock %}
+{% block title %}Underwriting Profile | CreditLens{% endblock %}
 
 {% block content %}
-<div class="container review-container">
-
-    <!-- HEADER -->
-    <div class="review-hero">
-        <div>
-            <h1 class="review-title">Application Review</h1>
-            <p class="review-subtitle">AI recommendation with credit manager final decision control</p>
+<div class="enterprise-layout review-layout-full">
+    <section class="enterprise-main">
+        <div class="enterprise-header">
+            <div>
+                <span class="eyebrow">{{ application_ref or ('CL-LEGACY-' ~ application_id) }}</span>
+                <h1>{{ applicant_name }}</h1>
+                <p>Financial profile, ML risk analytics, NLP explanation, and final decision controls.</p>
+            </div>
+            <div class="review-badges">
+                <span class="risk-badge {% if risk_level == 'Low' %}risk-low{% elif risk_level == 'Medium' %}risk-medium{% else %}risk-high{% endif %}">Risk: {{ risk_level }}</span>
+                <span class="confidence-badge">{% if confidence is none %}Confidence: Pending{% else %}Confidence: {{ confidence }}%{% endif %}</span>
+            </div>
         </div>
-    </div>
 
-    <!-- APPLICANT SUMMARY BANNER -->
-    <div class="review-summary-banner {% if ai_recommendation == 'Approved' %}approved-banner{% else %}rejected-banner{% endif %}">
-        <div>
-            <h2 class="review-applicant-name">{{ applicant_name }}</h2>
-            <p class="review-ai-status">AI Recommendation: <strong>{{ ai_recommendation }}</strong></p>
-            <p class="review-ai-status">Final Decision:
-                <strong>
-                    {% if final_decision == 'approved' %}
-                    Approved
-                    {% elif final_decision == 'rejected' %}
-                    Rejected
+        <div class="review-command-panel glass-panel">
+            <div>
+                <h3>Underwriting Decision Path</h3>
+                <p>
+                    {% if not has_prediction %}
+                    Customer profile is ready for manual ML analysis.
+                    {% elif final_decision == 'pending' %}
+                    Medium-risk case routed to manual review. Admin remarks are required before final decision.
+                    {% elif final_decision == 'hold' %}
+                    Application is on hold for additional checks.
                     {% else %}
-                    Pending Review
+                    Final decision has been recorded.
                     {% endif %}
-                </strong>
-            </p>
+                </p>
+            </div>
+            {% if not has_prediction %}
+            <form method="POST" action="{{ url_for('dashboard.run_ml_analysis', application_id=application_id) }}">
+                <button class="primary-btn" type="submit">Run ML Analysis</button>
+            </form>
+            {% endif %}
         </div>
 
-        <div class="review-badges">
-            <span class="risk-badge 
-                {% if risk_level == 'Low' %}
-                    risk-low
-                {% elif risk_level == 'Medium' %}
-                    risk-medium
-                {% else %}
-                    risk-high
-                {% endif %}">
-                Risk: {{ risk_level }}
-            </span>
+        <div class="enterprise-analytics-grid">
+            <div class="glass-panel">
+                <div class="panel-heading"><h3>Customer Financial Profile</h3><span>{{ tracking_status|replace('_', ' ')|title }}</span></div>
+                <div class="summary-grid enterprise-summary">
+                    <div class="summary-card"><span class="summary-label">Email</span><strong>{{ applicant_email }}</strong></div>
+                    <div class="summary-card"><span class="summary-label">Annual Income</span><strong>Rs. {{ "{:,.0f}".format(applicant_income) }}</strong></div>
+                    <div class="summary-card"><span class="summary-label">Loan Amount</span><strong>Rs. {{ "{:,.0f}".format(loan_amount) }}</strong></div>
+                    <div class="summary-card"><span class="summary-label">Credit Score</span><strong>{{ credit_score }}</strong></div>
+                    <div class="summary-card"><span class="summary-label">Credit History</span><strong>{{ credit_history_length }} years</strong></div>
+                    <div class="summary-card"><span class="summary-label">Loan Intent</span><strong>{{ loan_intent }}</strong></div>
+                    <div class="summary-card"><span class="summary-label">Home Ownership</span><strong>{{ home_ownership }}</strong></div>
+                    <div class="summary-card"><span class="summary-label">Education</span><strong>{{ education }}</strong></div>
+                </div>
+            </div>
 
-            <span class="confidence-badge">
-                Confidence: {{ confidence }}%
-            </span>
+            <div class="glass-panel">
+                <div class="panel-heading"><h3>Risk Analysis</h3><span>{{ review_queue|replace('_', ' ')|title }}</span></div>
+                <ul class="reason-list dashboard-list">
+                    {% for factor in decision_factors %}
+                    <li>{{ factor }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-    </div>
 
-    <!-- MAIN GRID -->
-    <div class="review-grid">
+        <div class="glass-panel profile-visual-panel">
+            <div class="panel-heading">
+                <h3>Hidden Risk Analytics</h3>
+                <span>Portfolio benchmark and internal signals</span>
+            </div>
 
-        <!-- LEFT PANEL -->
-        <div class="dashboard-panel compact-panel">
-            <h3>Applicant Summary</h3>
-
-            <div class="summary-grid">
-                <div class="summary-card">
-                    <span class="summary-label">Customer Email</span>
-                    <strong>{{ applicant_email }}</strong>
+            <div class="profile-visual-grid">
+                <div class="score-gauge-card">
+                    <div class="score-gauge metric-{% if model_risk_percent <= 35 %}success{% elif model_risk_percent <= 65 %}warning{% else %}danger{% endif %}" style="--score: {{ model_risk_percent }}%;">
+                        <div class="score-gauge-inner">
+                            <strong>{{ model_risk_percent|round|int }}%</strong>
+                            <span>Risk Index</span>
+                        </div>
+                    </div>
+                    <div class="score-gauge-scale">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
                 </div>
 
-                <div class="summary-card">
-                    <span class="summary-label">Annual Income</span>
-                    <strong>₹{{ "{:,.0f}".format(applicant_income) }}</strong>
+                <div class="visual-metric-grid">
+                    {% for metric in hidden_metrics %}
+                    <div class="visual-metric-card metric-{{ metric.tone }}">
+                        <div class="visual-metric-top">
+                            <span>{{ metric.label }}</span>
+                            <strong>{{ metric.value }}</strong>
+                        </div>
+                        <div class="metric-bar">
+                            <i style="width: {{ metric.percent }}%"></i>
+                        </div>
+                        <small>{{ metric.note }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="profile-chart-grid">
+                <div class="mini-chart-box">
+                    <div class="chart-title-row">
+                        <strong>Applicant vs Portfolio</strong>
+                        <span>Hidden benchmark</span>
+                    </div>
+                    {% for item in benchmark_rows %}
+                    <div class="chart-bar-row bar-{{ item.tone }}">
+                        <span>{{ item.label }}</span>
+                        <div class="dual-bar-track">
+                            <i class="applicant-bar" style="width: {{ item.applicant_percent }}%"></i>
+                            <i class="portfolio-bar" style="width: {{ item.portfolio_percent }}%"></i>
+                        </div>
+                        <strong>{{ item.applicant }} / {{ item.portfolio }}</strong>
+                    </div>
+                    {% endfor %}
+                    <div class="chart-legend-row">
+                        <span><i class="legend-dot applicant-dot"></i>Applicant</span>
+                        <span><i class="legend-dot portfolio-dot"></i>Portfolio avg</span>
+                    </div>
                 </div>
 
-                <div class="summary-card">
-                    <span class="summary-label">Loan Amount</span>
-                    <strong>₹{{ "{:,.0f}".format(loan_amount) }}</strong>
+                <div class="mini-chart-box">
+                    <div class="chart-title-row">
+                        <strong>Risk Factor Load</strong>
+                        <span>Internal risk drivers</span>
+                    </div>
+                    {% for item in risk_factor_bars %}
+                    <div class="chart-bar-row bar-{{ item.tone }}">
+                        <span>{{ item.label }}</span>
+                        <div class="chart-bar-track"><i style="width: {{ item.percent }}%"></i></div>
+                        <strong>{{ item.value }}</strong>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="profile-chart-grid canvas-chart-grid">
+                <div class="mini-chart-box chart-canvas-box">
+                    <div class="chart-title-row">
+                        <strong>Benchmark Chart</strong>
+                        <span>Normalized index</span>
+                    </div>
+                    <canvas id="benchmarkCanvas" height="220"></canvas>
                 </div>
 
-                <div class="summary-card">
-                    <span class="summary-label">Credit Score</span>
-                    <strong>{{ credit_score }}</strong>
-                </div>
-
-                <div class="summary-card">
-                    <span class="summary-label">Credit History Length</span>
-                    <strong>{{ credit_history_length }} years</strong>
-                </div>
-
-                <div class="summary-card">
-                    <span class="summary-label">Loan Intent</span>
-                    <strong>{{ loan_intent }}</strong>
-                </div>
-
-                <div class="summary-card">
-                    <span class="summary-label">Home Ownership</span>
-                    <strong>{{ home_ownership }}</strong>
-                </div>
-
-                <div class="summary-card">
-                    <span class="summary-label">Education</span>
-                    <strong>{{ education }}</strong>
+                <div class="mini-chart-box chart-canvas-box">
+                    <div class="chart-title-row">
+                        <strong>Risk Composition</strong>
+                        <span>Weighted signal mix</span>
+                    </div>
+                    <canvas id="riskCompositionCanvas" height="220"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- RIGHT PANEL -->
-        <div class="dashboard-panel compact-panel">
-            <h3>AI Decision Factors</h3>
+        <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const benchmarkData = {{ benchmark_chart|tojson }};
+            const riskData = {{ risk_composition_chart|tojson }};
 
-            <ul class="reason-list dashboard-list">
-                {% for factor in decision_factors %}
-                <li>{{ factor }}</li>
-                {% endfor %}
-            </ul>
+            function setupCanvas(canvas) {
+                const ratio = window.devicePixelRatio || 1;
+                const rect = canvas.getBoundingClientRect();
+                const cssHeight = rect.height || Number(canvas.getAttribute("height")) || 220;
+                canvas.width = rect.width * ratio;
+                canvas.height = cssHeight * ratio;
+                const ctx = canvas.getContext("2d");
+                ctx.scale(ratio, ratio);
+                return { ctx, width: rect.width, height: cssHeight };
+            }
+
+            function drawBenchmarkChart() {
+                const canvas = document.getElementById("benchmarkCanvas");
+                if (!canvas) return;
+                const chart = setupCanvas(canvas);
+                const ctx = chart.ctx;
+                const width = chart.width;
+                const height = chart.height;
+                const padding = { top: 18, right: 18, bottom: 44, left: 38 };
+                const plotWidth = width - padding.left - padding.right;
+                const plotHeight = height - padding.top - padding.bottom;
+                const groupWidth = plotWidth / benchmarkData.labels.length;
+                const barWidth = Math.min(18, groupWidth / 4);
+
+                ctx.clearRect(0, 0, width, height);
+                ctx.strokeStyle = "#e2e8f0";
+                ctx.fillStyle = "#64748b";
+                ctx.font = "11px Manrope, Segoe UI, sans-serif";
+
+                for (let tick = 0; tick <= 100; tick += 25) {
+                    const y = padding.top + plotHeight - (tick / 100) * plotHeight;
+                    ctx.beginPath();
+                    ctx.moveTo(padding.left, y);
+                    ctx.lineTo(width - padding.right, y);
+                    ctx.stroke();
+                    ctx.fillText(String(tick), 8, y + 4);
+                }
+
+                benchmarkData.labels.forEach(function (label, index) {
+                    const centerX = padding.left + groupWidth * index + groupWidth / 2;
+                    const applicantHeight = (benchmarkData.applicant[index] / 100) * plotHeight;
+                    const portfolioHeight = (benchmarkData.portfolio[index] / 100) * plotHeight;
+                    const baseY = padding.top + plotHeight;
+
+                    ctx.fillStyle = "#1f5eff";
+                    ctx.fillRect(centerX - barWidth - 2, baseY - applicantHeight, barWidth, applicantHeight);
+                    ctx.fillStyle = "#94a3b8";
+                    ctx.fillRect(centerX + 2, baseY - portfolioHeight, barWidth, portfolioHeight);
+
+                    ctx.fillStyle = "#475569";
+                    ctx.textAlign = "center";
+                    ctx.fillText(label, centerX, height - 18);
+                });
+
+                ctx.textAlign = "left";
+                ctx.fillStyle = "#1f5eff";
+                ctx.fillRect(padding.left, height - 8, 10, 4);
+                ctx.fillStyle = "#475569";
+                ctx.fillText("Applicant", padding.left + 14, height - 4);
+                ctx.fillStyle = "#94a3b8";
+                ctx.fillRect(padding.left + 92, height - 8, 10, 4);
+                ctx.fillStyle = "#475569";
+                ctx.fillText("Portfolio", padding.left + 106, height - 4);
+            }
+
+            function drawRiskCompositionChart() {
+                const canvas = document.getElementById("riskCompositionCanvas");
+                if (!canvas) return;
+                const chart = setupCanvas(canvas);
+                const ctx = chart.ctx;
+                const width = chart.width;
+                const height = chart.height;
+                const centerX = width * 0.34;
+                const centerY = height * 0.48;
+                const radius = Math.min(width, height) * 0.25;
+                const total = riskData.values.reduce((sum, value) => sum + value, 0) || 1;
+                const colors = ["#ef4444", "#f59e0b", "#64748b", "#1f5eff"];
+                let start = -Math.PI / 2;
+
+                ctx.clearRect(0, 0, width, height);
+                riskData.values.forEach(function (value, index) {
+                    const angle = (value / total) * Math.PI * 2;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.arc(centerX, centerY, radius, start, start + angle);
+                    ctx.closePath();
+                    ctx.fillStyle = colors[index];
+                    ctx.fill();
+                    start += angle;
+                });
+
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius * 0.58, 0, Math.PI * 2);
+                ctx.fillStyle = "#ffffff";
+                ctx.fill();
+                ctx.fillStyle = "#071a33";
+                ctx.font = "700 18px Manrope, Segoe UI, sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("Risk", centerX, centerY - 2);
+                ctx.font = "11px Manrope, Segoe UI, sans-serif";
+                ctx.fillStyle = "#64748b";
+                ctx.fillText("mix", centerX, centerY + 14);
+
+                ctx.textAlign = "left";
+                ctx.font = "12px Manrope, Segoe UI, sans-serif";
+                riskData.labels.forEach(function (label, index) {
+                    const y = 34 + index * 34;
+                    const x = width * 0.62;
+                    ctx.fillStyle = colors[index];
+                    ctx.fillRect(x, y - 10, 10, 10);
+                    ctx.fillStyle = "#172033";
+                    ctx.fillText(label, x + 16, y);
+                    ctx.fillStyle = "#64748b";
+                    ctx.fillText(String(Math.round(riskData.values[index])) + "%", x + 16, y + 15);
+                });
+            }
+
+            drawBenchmarkChart();
+            drawRiskCompositionChart();
+            window.addEventListener("resize", function () {
+                drawBenchmarkChart();
+                drawRiskCompositionChart();
+            });
+        });
+        </script>
+
+        {% if has_prediction %}
+        <div class="glass-panel nlp-underwriting-card">
+            <div class="panel-heading">
+                <h3>NLP Explanation</h3>
+                <span>Banking-style decision summary</span>
+            </div>
+            <div id="adminNlpLoading" class="nlp-loading"><span class="nlp-spinner"></span><span>Loading explanation...</span></div>
+            <div id="adminNlpContent" class="nlp-content" style="display:none;">
+                <p id="adminNlpExplanation"></p>
+                <p id="adminNlpFinancial"></p>
+                <ul class="reason-list" id="adminNlpTips"></ul>
+            </div>
         </div>
-
-    </div>
-
-    <!-- ACTION BUTTONS -->
-    <div class="manager-decision-panel">
-        <div>
-            <h3>Credit Manager Decision</h3>
-            <p>
-                {% if final_decision == 'pending' %}
-                Choose the final customer-facing decision after reviewing the model recommendation and applicant data.
-                {% else %}
-                This application has already been finalized.
-                {% endif %}
-            </p>
-        </div>
-
-        {% if final_decision == 'pending' %}
-        <form method="POST" action="{{ url_for('dashboard.decide_application', application_id=application_id) }}" class="manager-decision-actions">
-            <button type="submit" name="decision" value="approved" class="approve-btn">Approve</button>
-            <button type="submit" name="decision" value="rejected" class="reject-btn">Reject</button>
-        </form>
-        {% else %}
-        <span class="status-badge {% if final_decision == 'approved' %}status-approved{% else %}status-rejected{% endif %}">
-            Final: {{ final_decision|title }}
-        </span>
         {% endif %}
-    </div>
 
-    <div class="result-actions">
-        <a href="{{ url_for('dashboard.dashboard') }}" class="secondary-btn">Go to Dashboard</a>
-    </div>
+        <div class="enterprise-analytics-grid">
+            <div class="glass-panel">
+                <div class="panel-heading"><h3>Timeline Logs</h3><span>Lifecycle audit trail</span></div>
+                <div class="admin-timeline">
+                    {% for event in timeline_events %}
+                    <div class="admin-timeline-item">
+                        <strong>{{ event.title }}</strong>
+                        <span>{{ event.description or event.actor_role }}</span>
+                        <small>{{ event.created_at.strftime('%d %b %Y %H:%M') }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
 
+            <div class="glass-panel">
+                <div class="panel-heading"><h3>Admin Decision</h3><span>Email: {{ email_delivery_mode }}</span></div>
+                {% if has_prediction and final_decision in ['pending', 'hold'] %}
+                <form method="POST" action="{{ url_for('dashboard.decide_application', application_id=application_id) }}" class="enterprise-form">
+                    <div class="form-group">
+                        <label>Admin Remarks</label>
+                        <textarea name="admin_remarks" rows="4" placeholder="Record underwriting notes for internal audit..." {% if risk_level == 'Medium' %}required{% endif %}>{{ admin_remarks or '' }}</textarea>
+                    </div>
+                    <div class="manager-decision-actions">
+                        <button type="submit" name="decision" value="approved" class="approve-btn">Approve</button>
+                        <button type="submit" name="decision" value="hold" class="secondary-btn">Hold</button>
+                        <button type="submit" name="decision" value="rejected" class="reject-btn">Reject</button>
+                    </div>
+                </form>
+                {% else %}
+                <span class="status-badge {% if final_decision == 'approved' %}status-approved{% elif final_decision == 'rejected' %}status-rejected{% else %}status-pending{% endif %}">
+                    Final: {{ final_decision|replace('_', ' ')|title }}
+                </span>
+                {% endif %}
+
+                {% if has_prediction and final_decision in ['approved', 'rejected'] %}
+                <form method="POST" action="{{ url_for('dashboard.resend_decision_email', application_id=application_id) }}" class="manager-decision-actions email-action-row">
+                    <button type="submit" class="secondary-btn">{% if email_sent %}Resend Email{% else %}Send Email{% endif %}</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </section>
 </div>
+
+{% if has_prediction %}
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+    const loading = document.getElementById("adminNlpLoading");
+    const content = document.getElementById("adminNlpContent");
+    try {
+        const response = await fetch("{{ url_for('predict.explanation_api', application_id=application_id) }}");
+        const payload = await response.json();
+        if (!payload.success) throw new Error(payload.message || "Unable to load explanation");
+        document.getElementById("adminNlpExplanation").textContent = payload.explanation.explanation_text || "";
+        document.getElementById("adminNlpFinancial").textContent = payload.explanation.financial_analysis || "";
+        const tips = document.getElementById("adminNlpTips");
+        (payload.explanation.smart_tips || []).forEach(function (item) {
+            const li = document.createElement("li");
+            li.textContent = item;
+            tips.appendChild(li);
+        });
+        loading.style.display = "none";
+        content.style.display = "block";
+    } catch (error) {
+        loading.textContent = error.message;
+    }
+});
+</script>
+{% endif %}
 {% endblock %}

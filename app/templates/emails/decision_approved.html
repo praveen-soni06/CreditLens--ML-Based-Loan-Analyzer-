@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreditLens Loan Approval</title>
+    <style>
+        body { margin: 0; padding: 0; background: #f3f6fb; font-family: Arial, sans-serif; color: #1e293b; }
+        table { border-collapse: collapse; }
+        .wrapper { width: 100%; padding: 24px 0; }
+        .card { max-width: 640px; margin: 0 auto; background: #ffffff; border: 1px solid #dbe5f2; border-radius: 12px; overflow: hidden; }
+        .header { background: #102a5c; color: #ffffff; padding: 20px 24px; }
+        .header h1 { margin: 0; font-size: 22px; font-weight: 700; }
+        .content { padding: 24px; font-size: 15px; line-height: 1.6; }
+        .pill { display: inline-block; padding: 6px 10px; border-radius: 999px; background: #e7f7ed; color: #156534; font-size: 12px; font-weight: 700; }
+        .summary { width: 100%; margin: 18px 0; border: 1px solid #dbe5f2; border-radius: 10px; overflow: hidden; }
+        .summary td { padding: 12px 14px; border-bottom: 1px solid #e6edf7; }
+        .summary tr:last-child td { border-bottom: 0; }
+        .k { width: 45%; color: #475569; }
+        .v { font-weight: 700; color: #0f172a; }
+        .cta-wrap { text-align: center; margin: 28px 0 20px; }
+        .cta { background: #1d4ed8; color: #ffffff !important; text-decoration: none; padding: 12px 20px; border-radius: 8px; font-weight: 700; display: inline-block; }
+        .section-title { margin: 22px 0 10px; font-size: 16px; font-weight: 700; color: #0f172a; }
+        ul { padding-left: 20px; margin: 8px 0 0; }
+        li { margin: 6px 0; }
+        .support { margin-top: 24px; border-top: 1px solid #e6edf7; padding-top: 14px; color: #475569; font-size: 14px; }
+        .footer { padding: 16px 24px 24px; color: #64748b; font-size: 12px; text-align: center; }
+        @media only screen and (max-width: 620px) {
+            .content { padding: 18px; }
+            .header { padding: 18px; }
+            .header h1 { font-size: 20px; }
+            .summary td { display: block; width: 100%; }
+            .k { padding-bottom: 4px; border-bottom: 0; }
+        }
+    </style>
+</head>
+<body>
+<table role="presentation" class="wrapper" width="100%">
+    <tr>
+        <td>
+            <table role="presentation" class="card" width="100%">
+                <tr>
+                    <td class="header">
+                        <h1>CreditLens</h1>
+                        <p style="margin:6px 0 0; font-size:14px; opacity:0.9;">Loan Application Decision Update</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="content">
+                        <span class="pill">Application Approved</span>
+                        <p>Hello {{ customer_name }},</p>
+                        <p>Your loan application has been approved after our credit and repayment evaluation.</p>
+
+                        <table role="presentation" class="summary">
+                            <tr>
+                                <td class="k">Approved Loan Amount</td>
+                                <td class="v">INR {{ "{:,.0f}".format(approved_loan_amount) }}</td>
+                            </tr>
+                            <tr>
+                                <td class="k">Interest Rate</td>
+                                <td class="v">{{ "{:.2f}".format(interest_rate) }}%</td>
+                            </tr>
+                            <tr>
+                                <td class="k">Proposed Loan Tenure</td>
+                                <td class="v">{{ loan_tenure_months }} months</td>
+                            </tr>
+                            <tr>
+                                <td class="k">Loan Purpose</td>
+                                <td class="v">{{ loan_intent }}</td>
+                            </tr>
+                        </table>
+
+                        <p class="section-title">Next verification steps</p>
+                        <ul>
+                            <li>Log in to the secure CreditLens portal and review your application summary.</li>
+                            <li>Upload any requested KYC or income documents for compliance checks.</li>
+                            <li>Complete e-sign confirmation to proceed with disbursement processing.</li>
+                        </ul>
+
+                        <div class="cta-wrap">
+                            <a href="{{ portal_url }}" class="cta">Open Secure Portal</a>
+                        </div>
+
+                        <div class="support">
+                            <strong>Need support?</strong><br>
+                            Email: {{ support_email }}<br>
+                            Phone: {{ support_phone }}<br>
+                            Hours: {{ support_hours }}
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="footer">
+                        This is a service message from CreditLens. Please do not share OTPs or account credentials over email.
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

@@ -3,12 +3,13 @@
 {% block title %}Loan Application | CreditLens{% endblock %}
 
 {% block content %}
-<div class="application-wrapper">
+<div class="application-wrapper enterprise-assistant">
     <div class="application-topbar">
         <div class="portal-title">
             <img class="portal-logo-img" src="{{ url_for('static', filename='images/creditlens-logo.png') }}" alt="CreditLens logo">
             <div>
-                <h2>CreditLens - Credit Underwriting Portal</h2>
+                <h2>CreditLens Assistant Intake Portal</h2>
+                <p>Secure loan origination and underwriting handoff</p>
             </div>
         </div>
 
@@ -25,7 +26,15 @@
         <div class="progress-step active" id="progress-1">1. Customer Info</div>
         <div class="progress-step" id="progress-2">2. Loan Application</div>
         <div class="progress-step" id="progress-3">3. Review & Submit</div>
-        <div class="progress-step" id="progress-4">4. ML Prediction</div>
+        <div class="progress-step" id="progress-4">4. Underwriting Review</div>
+    </div>
+
+    <div class="completion-meter">
+        <div>
+            <span>Form Completion</span>
+            <strong id="completionPercent">0%</strong>
+        </div>
+        <i id="completionBar"></i>
     </div>
 
     <div class="application-meta">
@@ -193,7 +202,7 @@
             <section class="form-section">
                 <div class="section-header">
                     <h3>Review & Submit</h3>
-                    <p>Review the entered details before final submission</p>
+                    <p>Submit to credit underwriting. ML analysis will be run by admin after email verification.</p>
                 </div>
 
                 <div class="review-box">
@@ -225,7 +234,7 @@
 
             <div class="form-actions">
                 <button type="button" class="secondary-btn" id="back-step-3">Back</button>
-                <button type="submit" class="primary-btn">Submit Application</button>
+                <button type="submit" class="primary-btn">Submit for Underwriting Review</button>
             </div>
         </div>
 

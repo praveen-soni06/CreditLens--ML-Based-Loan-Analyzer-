@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Tracking Verification | CreditLens{% endblock %}
+
+{% block content %}
+<div class="tracking-shell">
+    <div class="tracking-card glass-panel">
+        <span class="eyebrow">Secure Verification</span>
+        <h1>Verify Tracking Access</h1>
+        <p>We sent a 6-digit code to <strong>{{ customer_email }}</strong> for application <strong>{{ application_ref }}</strong>.</p>
+
+        {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('tracking.verify_tracking_otp') }}" class="enterprise-form otp-mini-form">
+            <div class="form-group floating-field">
+                <input type="text" name="verification_code" maxlength="6" placeholder="000000" required>
+                <label>Verification Code</label>
+            </div>
+            <button type="submit" class="primary-btn">View Status</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+CreditLens Loan Application Update
+
+Hello {{ customer_name }},
+
+Thank you for applying with CreditLens. After review of your current application details, we are unable to approve this request at this time.
+
+Main review reasons:
+{% for reason in reasons -%}
+- {{ reason }}
+{% endfor %}
+
+Financial issues identified:
+{% for issue in financial_issues -%}
+- {{ issue }}
+{% endfor %}
+
+How to improve eligibility:
+{% for item in suggestions -%}
+- {{ item }}
+{% endfor %}
+
+Future re-application guidance:
+You are welcome to reapply after strengthening your profile. A fresh review will be performed on your updated financial and credit information.
+
+Support:
+Email: {{ support_email }}
+Phone: {{ support_phone }}
+Hours: {{ support_hours }}
+
+Regards,
+CreditLens Support

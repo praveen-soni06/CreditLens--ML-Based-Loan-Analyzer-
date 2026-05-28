@@ -3,10 +3,6 @@ from app.database.db import User
 
 auth_bp = Blueprint('auth', __name__)
 
-@auth_bp.route('/', methods=['GET'])
-def root():
-    return redirect(url_for('auth.login'))
-
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET' and 'user_id' in session:

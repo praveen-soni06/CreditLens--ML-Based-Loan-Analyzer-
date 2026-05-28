@@ -3,42 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CreditLens Login</title>
+    <title>CreditLens Secure Access</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/creditlens-logo.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
-<body class="login-page">
-
-    <div class="login-wrapper">
-        <div class="login-card">
-            <img class="login-logo-img" src="{{ url_for('static', filename='images/creditlens-logo.png') }}" alt="CreditLens logo">
-
-            <form method="POST" action="{{ url_for('auth.login') }}" class="login-form">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" name="username" placeholder="Enter username" required>
+<body class="login-page enterprise-login">
+    <main class="enterprise-login-grid">
+        <section class="login-intel-panel">
+            <div class="brand-lockup large">
+                <img class="brand-logo-img" src="{{ url_for('static', filename='images/creditlens-logo.png') }}" alt="CreditLens logo">
+                <div>
+                    <div class="logo">CreditLens</div>
+                    <span class="nav-role">Enterprise Underwriting Platform</span>
                 </div>
-
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" name="password" placeholder="Enter password" required>
-                </div>
-
-                {% if error %}
-                    <div class="login-error">{{ error }}</div>
-                {% endif %}
-
-                <button type="submit" class="submit-btn">Login</button>
-            </form>
-
-            <div class="login-footer">
-                <p><strong>Demo Credentials:</strong></p>
-                <p>Manager: <code>admin</code> / <code>admin123</code></p>
-                <p>Assistant: <code>assistant</code> / <code>assistant123</code></p>
-                <small>Authorized banking personnel only.</small>
             </div>
-        </div>
-    </div>
+            <h1>Secure credit underwriting for modern lending teams.</h1>
+            <p>Role-based access for loan assistants, credit managers, and customer tracking workflows.</p>
+        </section>
 
+        <section class="enterprise-access-stack">
+            <div class="login-card enterprise-auth-card">
+                <span class="eyebrow">Staff Workspace</span>
+                <h2>Authorized Login</h2>
+                <p class="auth-card-copy">Loan assistants and credit managers can access underwriting operations here.</p>
+                <form method="POST" action="{{ url_for('auth.login') }}" class="login-form">
+                    <div class="form-group floating-field">
+                        <input type="text" name="username" placeholder="admin or assistant" required>
+                        <label>Username</label>
+                    </div>
+                    <div class="form-group floating-field">
+                        <input type="password" name="password" placeholder="Password" required>
+                        <label>Password</label>
+                    </div>
+                    {% if error %}
+                    <div class="login-error">{{ error }}</div>
+                    {% endif %}
+                    <button type="submit" class="submit-btn">Secure Login</button>
+                </form>
+                <div class="login-footer">
+                    <p>Manager: <code>admin</code> / <code>admin123</code></p>
+                    <p>Assistant: <code>assistant</code> / <code>assistant123</code></p>
+                </div>
+            </div>
+
+            <div class="customer-track-box">
+                <div>
+                    <span class="eyebrow">Customer Portal</span>
+                    <h2>Track Application</h2>
+                    <p>Customers can check loan status securely using Application ID, registered email, and OTP.</p>
+                </div>
+                <a href="{{ url_for('tracking.track_application') }}" class="track-cta">Track Status</a>
+            </div>
+        </section>
+    </main>
 </body>
 </html>

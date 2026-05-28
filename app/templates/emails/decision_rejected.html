@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreditLens Loan Application Status</title>
+    <style>
+        body { margin: 0; padding: 0; background: #f3f6fb; font-family: Arial, sans-serif; color: #1e293b; }
+        table { border-collapse: collapse; }
+        .wrapper { width: 100%; padding: 24px 0; }
+        .card { max-width: 640px; margin: 0 auto; background: #ffffff; border: 1px solid #dbe5f2; border-radius: 12px; overflow: hidden; }
+        .header { background: #102a5c; color: #ffffff; padding: 20px 24px; }
+        .header h1 { margin: 0; font-size: 22px; font-weight: 700; }
+        .content { padding: 24px; font-size: 15px; line-height: 1.6; }
+        .pill { display: inline-block; padding: 6px 10px; border-radius: 999px; background: #fef2f2; color: #991b1b; font-size: 12px; font-weight: 700; }
+        .section-title { margin: 22px 0 8px; font-size: 16px; font-weight: 700; color: #0f172a; }
+        ul { padding-left: 20px; margin: 8px 0 0; }
+        li { margin: 6px 0; }
+        .support { margin-top: 24px; border-top: 1px solid #e6edf7; padding-top: 14px; color: #475569; font-size: 14px; }
+        .footer { padding: 16px 24px 24px; color: #64748b; font-size: 12px; text-align: center; }
+        .panel { margin-top: 12px; border: 1px solid #dbe5f2; border-radius: 10px; padding: 12px 14px; background: #f8fafc; }
+        @media only screen and (max-width: 620px) {
+            .content { padding: 18px; }
+            .header { padding: 18px; }
+            .header h1 { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+<table role="presentation" class="wrapper" width="100%">
+    <tr>
+        <td>
+            <table role="presentation" class="card" width="100%">
+                <tr>
+                    <td class="header">
+                        <h1>CreditLens</h1>
+                        <p style="margin:6px 0 0; font-size:14px; opacity:0.9;">Loan Application Decision Update</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="content">
+                        <span class="pill">Application Status: Not Approved</span>
+                        <p>Hello {{ customer_name }},</p>
+                        <p>Thank you for applying with CreditLens. After review of your current application details, we are unable to approve this request at this time.</p>
+
+                        <p class="section-title">Main review reasons</p>
+                        <div class="panel">
+                            <ul>
+                                {% for reason in reasons %}
+                                <li>{{ reason }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <p class="section-title">Financial issues identified</p>
+                        <ul>
+                            {% for issue in financial_issues %}
+                            <li>{{ issue }}</li>
+                            {% endfor %}
+                        </ul>
+
+                        <p class="section-title">How to improve eligibility</p>
+                        <ul>
+                            {% for item in suggestions %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+
+                        <p class="section-title">Future re-application guidance</p>
+                        <p>You are welcome to reapply after strengthening your profile. A fresh review will be performed on your updated financial and credit information.</p>
+
+                        <div class="support">
+                            <strong>Need guidance before reapplying?</strong><br>
+                            Email: {{ support_email }}<br>
+                            Phone: {{ support_phone }}<br>
+                            Hours: {{ support_hours }}
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="footer">
+                        This is a service message from CreditLens. Please do not share OTPs or account credentials over email.
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
