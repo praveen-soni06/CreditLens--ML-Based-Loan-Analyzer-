@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, session, url_for
 
 from app.database.db import Application
 from app.utils.email_utils import generate_verification_code, send_verification_code_email
@@ -63,6 +63,16 @@ def build_customer_tracking_view(application):
     }
 
 
+def render_tracking_verification(application, error=None, notice=None):
+    return render_template(
+        'track_verify.html',
+        application_ref=application.application_ref,
+        customer_email=application.customer_email,
+        error=error,
+        notice=notice
+    )
+
+
 @tracking_bp.route('/track', methods=['GET', 'POST'])
 def track_application():
     if request.method == 'POST':
@@ -83,10 +93,9 @@ def track_application():
 
         send_verification_code_email(application.customer_name, application.customer_email, code)
         flash("A verification code has been sent to the registered email.", "success")
-        return render_template(
-            'track_verify.html',
-            application_ref=application.application_ref,
-            customer_email=application.customer_email
+        return render_tracking_verification(
+            application,
+            notice="We have sent a 6-digit verification code to the registered email address."
         )
 
     return render_template('track.html')
@@ -108,15 +117,78 @@ def verify_tracking_otp():
 
     if code != expected:
         application = Application.query.get(application_id)
-        return render_template(
-            'track_verify.html',
-            application_ref=application.application_ref if application else "",
-            customer_email=application.customer_email if application else "",
-            error="Invalid verification code."
-        )
+        if not application:
+            return redirect(url_for('tracking.track_application'))
+        return render_tracking_verification(application, error="Invalid verification code.")
 
     session['tracking_verified_application_id'] = application_id
     return redirect(url_for('tracking.tracking_status'))
+
+
+@tracking_bp.route('/track/verify/api', methods=['POST'])
+def verify_tracking_otp_api():
+    payload = request.get_json(silent=True) or {}
+    code = str(payload.get('verification_code', '')).strip()
+    application_id = session.get('tracking_application_id')
+    expected = session.get('tracking_otp')
+    expires_at = session.get('tracking_otp_expires_at')
+
+    if not application_id or not expected or not expires_at:
+        return jsonify({
+            "success": False,
+            "message": "Tracking session expired. Please start tracking again.",
+            "redirect_url": url_for('tracking.track_application')
+        }), 400
+
+    if datetime.utcnow() > datetime.fromisoformat(expires_at):
+        return jsonify({
+            "success": False,
+            "message": "Tracking verification code has expired. Please request a new OTP."
+        }), 400
+
+    if code != expected:
+        return jsonify({
+            "success": False,
+            "message": "Invalid OTP. Please check the code and try again."
+        }), 400
+
+    session['tracking_verified_application_id'] = application_id
+    session.pop('tracking_otp', None)
+    session.pop('tracking_otp_expires_at', None)
+    return jsonify({
+        "success": True,
+        "message": "OTP verified successfully. Opening application status.",
+        "redirect_url": url_for('tracking.tracking_status')
+    })
+
+
+@tracking_bp.route('/track/verify/resend', methods=['POST'])
+def resend_tracking_otp_api():
+    application_id = session.get('tracking_application_id')
+    if not application_id:
+        return jsonify({
+            "success": False,
+            "message": "Tracking session expired. Please start tracking again.",
+            "redirect_url": url_for('tracking.track_application')
+        }), 400
+
+    application = Application.query.get(application_id)
+    if not application:
+        return jsonify({
+            "success": False,
+            "message": "Application could not be found."
+        }), 404
+
+    code = generate_verification_code()
+    session['tracking_otp'] = code
+    session['tracking_otp_expires_at'] = (datetime.utcnow() + timedelta(minutes=10)).isoformat()
+
+    send_verification_code_email(application.customer_name, application.customer_email, code)
+    return jsonify({
+        "success": True,
+        "message": "A new OTP has been sent to the registered email.",
+        "cooldown_seconds": 45
+    })
 
 
 @tracking_bp.route('/track/status')
