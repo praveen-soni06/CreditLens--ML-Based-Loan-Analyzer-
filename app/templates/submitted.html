@@ -3,31 +3,55 @@
 {% block title %}Application Submitted | CreditLens{% endblock %}
 
 {% block content %}
-<div class="enterprise-shell">
-    <section class="submission-hero glass-panel">
-        <span class="eyebrow">CreditLens Underwriting Intake</span>
-        <h1>Application successfully submitted for credit underwriting review.</h1>
-        <p>{{ message }}</p>
+<div class="submitted-shell">
+    <section class="bank-confirmation-panel">
+        <div class="bank-confirmation-band"></div>
 
-        <div class="application-id-box">
-            <span>Application ID</span>
-            <strong>{{ application_ref }}</strong>
-        </div>
+        <div class="bank-confirmation-content">
+            <div class="confirmation-status-pill">
+                <span class="confirmation-status-dot"></span>
+                Email verification complete
+            </div>
 
-        <div class="submission-actions">
-            {% if verify_url %}
-            <a href="{{ verify_url }}" class="primary-btn">Verify Customer Email</a>
+            <div class="confirmation-heading">
+                <span class="eyebrow">CreditLens Underwriting Intake</span>
+                <h1>Application submitted for credit underwriting review.</h1>
+                <p>{{ message }}</p>
+            </div>
+
+            <div class="confirmation-grid">
+                <div class="confirmation-id-card">
+                    <span>Application ID</span>
+                    <strong>{{ application_ref }}</strong>
+                    <small>Use this reference for all customer tracking updates.</small>
+                </div>
+
+                <div class="confirmation-summary-card">
+                    <span>Current Stage</span>
+                    <strong>Underwriting Review</strong>
+                    <small>The credit team can now process this application.</small>
+                </div>
+            </div>
+
+            <div class="submission-actions refined-actions">
+                {% if verify_url %}
+                <a href="{{ verify_url }}" class="primary-btn">Verify Customer Email</a>
+                {% elif application_id %}
+                <a href="{{ url_for('predict.track_submitted_application', application_id=application_id) }}" class="primary-btn">Track Application Status</a>
+                {% endif %}
+            </div>
+
+            <div class="confirmation-note">
+                Customer tracking is active only after verified email access. Internal risk scores and admin remarks remain hidden from the customer portal.
+            </div>
+
+            {% if delivery_notice %}
+            <div class="alert alert-info">{{ delivery_notice }}</div>
             {% endif %}
-            <a href="{{ url_for('tracking.track_application') }}" class="secondary-btn">Track Application</a>
-            <a href="{{ url_for('predict.application') }}" class="secondary-btn">New Application</a>
+            {% if dev_verification_code %}
+            <div class="alert alert-info">Dev OTP: <strong>{{ dev_verification_code }}</strong></div>
+            {% endif %}
         </div>
-
-        {% if delivery_notice %}
-        <div class="alert alert-info">{{ delivery_notice }}</div>
-        {% endif %}
-        {% if dev_verification_code %}
-        <div class="alert alert-info">Dev OTP: <strong>{{ dev_verification_code }}</strong></div>
-        {% endif %}
     </section>
 </div>
 {% endblock %}

@@ -176,6 +176,22 @@ def get_result_redirect_url(application_id):
     return url_for('predict.prediction_result', application_id=application_id)
 
 
+def get_submission_redirect_url(application_id):
+    return url_for('predict.submission_status', application_id=application_id)
+
+
+def render_email_verification_screen(application, verification, error=None, delivery_notice=None):
+    return render_template(
+        'verify_email.html',
+        application_id=application.id,
+        customer_email=application.customer_email,
+        customer_name=application.customer_name,
+        error=error,
+        delivery_notice=delivery_notice,
+        dev_verification_code=get_dev_verification_code(verification)
+    )
+
+
 def generate_and_store_nlp_explanation(application, prediction, result, risk_level, confidence_score, language_code="en", force=False):
     if not force:
         existing = get_latest_decision_explanation(
@@ -606,6 +622,7 @@ def verify_email(application_id):
             return render_template(
                 'submitted.html',
                 application_ref=application.application_ref,
+                application_id=application.id,
                 customer_email=application.customer_email,
                 message="Email is already verified. Application tracking is active."
             )
@@ -631,19 +648,12 @@ def verify_email(application_id):
             return render_template(
                 'submitted.html',
                 application_ref=application.application_ref,
+                application_id=application.id,
                 customer_email=application.customer_email,
                 message="Email verified successfully. Application tracking is now active."
             )
 
-    return render_template(
-        'verify_email.html',
-        application_id=application_id,
-        customer_email=application.customer_email,
-        customer_name=application.customer_name,
-        error=error,
-        delivery_notice=None,
-        dev_verification_code=get_dev_verification_code(verification)
-    )
+    return render_email_verification_screen(application, verification, error=error)
 
 
 @predict_bp.route('/result/<int:application_id>')
@@ -723,7 +733,7 @@ def verify_email_api(application_id):
         return jsonify({
             "success": True,
             "message": "Email already verified.",
-            "redirect_url": url_for('tracking.track_application')
+            "redirect_url": get_submission_redirect_url(application.id)
         })
 
     if datetime.utcnow() > verification.expires_at:
@@ -761,8 +771,52 @@ def verify_email_api(application_id):
     return jsonify({
         "success": True,
         "message": "OTP verified successfully. Application tracking is active.",
-        "redirect_url": url_for('tracking.track_application')
+        "redirect_url": get_submission_redirect_url(application.id)
     })
+
+
+@predict_bp.route('/submitted/<int:application_id>')
+def submission_status(application_id):
+    guard = require_loan_assistant()
+    if guard:
+        return guard
+
+    application = Application.query.get_or_404(application_id)
+    verification = EmailVerification.query.filter_by(application_id=application_id).first()
+
+    if verification and not verification.verified:
+        return render_email_verification_screen(
+            application,
+            verification,
+            delivery_notice="We have sent a 6-digit verification code to the customer's email address."
+        )
+
+    return render_template(
+        'submitted.html',
+        application_ref=application.application_ref,
+        application_id=application.id,
+        customer_email=application.customer_email,
+        message="Email verified successfully. Application tracking is now active."
+    )
+
+
+@predict_bp.route('/submitted/<int:application_id>/track')
+def track_submitted_application(application_id):
+    guard = require_loan_assistant()
+    if guard:
+        return guard
+
+    application = Application.query.get_or_404(application_id)
+    verification = EmailVerification.query.filter_by(application_id=application_id).first()
+
+    if verification and not verification.verified:
+        return redirect(url_for('predict.verify_email', application_id=application.id))
+
+    session['tracking_verified_application_id'] = application.id
+    session.pop('tracking_application_id', None)
+    session.pop('tracking_otp', None)
+    session.pop('tracking_otp_expires_at', None)
+    return redirect(url_for('tracking.tracking_status'))
 
 
 @predict_bp.route('/api/verify-email/<int:application_id>/resend', methods=['POST'])
@@ -981,13 +1035,8 @@ def predict():
             application_id=None
         )
 
-    return render_template(
-        'submitted.html',
-        application_ref=new_application.application_ref,
-        application_id=new_application.id,
-        customer_email=customer_email,
-        message="Application successfully submitted for credit underwriting review.",
-        verify_url=url_for('predict.verify_email', application_id=new_application.id),
-        delivery_notice=get_email_delivery_notice(delivery),
-        dev_verification_code=get_dev_verification_code(verification)
+    return render_email_verification_screen(
+        new_application,
+        verification,
+        delivery_notice=get_email_delivery_notice(delivery)
     )

@@ -1,25 +1,309 @@
 {% extends "base.html" %}
 
-{% block title %}Tracking Verification | CreditLens{% endblock %}
+{% block title %}Tracking OTP Verification | CreditLens{% endblock %}
 
 {% block content %}
-<div class="tracking-shell">
-    <div class="tracking-card glass-panel">
-        <span class="eyebrow">Secure Verification</span>
-        <h1>Verify Tracking Access</h1>
-        <p>We sent a 6-digit code to <strong>{{ customer_email }}</strong> for application <strong>{{ application_ref }}</strong>.</p>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    fintech: {
+                        50: "#eff6ff",
+                        100: "#dbeafe",
+                        600: "#2563eb",
+                        700: "#1d4ed8",
+                        800: "#1e3a8a",
+                        900: "#172554"
+                    }
+                }
+            }
+        }
+    };
+</script>
 
-        {% if error %}
-        <div class="alert alert-error">{{ error }}</div>
-        {% endif %}
-
-        <form method="POST" action="{{ url_for('tracking.verify_tracking_otp') }}" class="enterprise-form otp-mini-form">
-            <div class="form-group floating-field">
-                <input type="text" name="verification_code" maxlength="6" placeholder="000000" required>
-                <label>Verification Code</label>
-            </div>
-            <button type="submit" class="primary-btn">View Status</button>
-        </form>
-    </div>
+<div class="min-h-[calc(100vh-140px)] py-8 px-4">
+    <div id="tracking-otp-root"></div>
 </div>
+
+<script id="tracking-otp-config" type="application/json">{{ {
+    "applicationRef": application_ref,
+    "customerEmail": customer_email,
+    "verifyEndpoint": url_for('tracking.verify_tracking_otp_api'),
+    "resendEndpoint": url_for('tracking.resend_tracking_otp_api'),
+    "backUrl": url_for('tracking.track_application'),
+    "initialError": error,
+    "notice": notice
+} | tojson }}</script>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel">
+    const { useEffect, useMemo, useRef, useState } = React;
+
+    function formatCountdown(totalSeconds) {
+        const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+        const seconds = String(totalSeconds % 60).padStart(2, "0");
+        return `${minutes}:${seconds}`;
+    }
+
+    function TrackingOtpApp() {
+        const config = JSON.parse(document.getElementById("tracking-otp-config").textContent || "{}");
+
+        const [otpDigits, setOtpDigits] = useState(Array(6).fill(""));
+        const [verifying, setVerifying] = useState(false);
+        const [resending, setResending] = useState(false);
+        const [countdown, setCountdown] = useState(45);
+        const [banner, setBanner] = useState(
+            config.initialError
+                ? { type: "error", message: config.initialError }
+                : config.notice
+                    ? { type: "info", message: config.notice }
+                    : null
+        );
+        const inputRefs = useRef([]);
+
+        useEffect(() => {
+            inputRefs.current[0]?.focus();
+        }, []);
+
+        useEffect(() => {
+            if (countdown <= 0) {
+                return undefined;
+            }
+            const timer = window.setInterval(() => {
+                setCountdown((previous) => (previous > 0 ? previous - 1 : 0));
+            }, 1000);
+            return () => window.clearInterval(timer);
+        }, [countdown]);
+
+        const otpCode = useMemo(() => otpDigits.join(""), [otpDigits]);
+        const isOtpComplete = otpCode.length === 6 && otpDigits.every((digit) => digit !== "");
+
+        function showBanner(type, message) {
+            setBanner({ type, message });
+        }
+
+        function handleOtpInput(index, rawValue) {
+            const digitsOnly = rawValue.replace(/\D/g, "");
+            const next = [...otpDigits];
+
+            if (!digitsOnly) {
+                next[index] = "";
+                setOtpDigits(next);
+                return;
+            }
+
+            if (digitsOnly.length > 1) {
+                let cursor = index;
+                digitsOnly.split("").forEach((digit) => {
+                    if (cursor < 6) {
+                        next[cursor] = digit;
+                        cursor += 1;
+                    }
+                });
+                setOtpDigits(next);
+                inputRefs.current[Math.min(cursor, 5)]?.focus();
+                return;
+            }
+
+            next[index] = digitsOnly;
+            setOtpDigits(next);
+            if (index < 5) {
+                inputRefs.current[index + 1]?.focus();
+            }
+        }
+
+        function handleKeyDown(event, index) {
+            if (event.key === "Backspace" && otpDigits[index] === "" && index > 0) {
+                const next = [...otpDigits];
+                next[index - 1] = "";
+                setOtpDigits(next);
+                inputRefs.current[index - 1]?.focus();
+            }
+            if (event.key === "ArrowLeft" && index > 0) {
+                inputRefs.current[index - 1]?.focus();
+            }
+            if (event.key === "ArrowRight" && index < 5) {
+                inputRefs.current[index + 1]?.focus();
+            }
+        }
+
+        async function handleVerify(event) {
+            event.preventDefault();
+            if (!isOtpComplete || verifying) {
+                return;
+            }
+
+            setVerifying(true);
+            showBanner("info", "Verifying secure access. Please wait...");
+
+            try {
+                const response = await fetch(config.verifyEndpoint, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ verification_code: otpCode })
+                });
+                const payload = await response.json();
+
+                if (!response.ok || !payload.success) {
+                    showBanner("error", payload.message || "Invalid OTP. Please try again.");
+                    if (payload.redirect_url) {
+                        window.setTimeout(() => {
+                            window.location.href = payload.redirect_url;
+                        }, 1200);
+                    }
+                    return;
+                }
+
+                showBanner("success", payload.message || "OTP verified successfully.");
+                window.setTimeout(() => {
+                    window.location.href = payload.redirect_url;
+                }, 800);
+            } catch (error) {
+                showBanner("error", "Network issue while verifying OTP. Please try again.");
+            } finally {
+                setVerifying(false);
+            }
+        }
+
+        async function handleResend() {
+            if (countdown > 0 || resending) {
+                return;
+            }
+
+            setResending(true);
+            showBanner("info", "Sending a new tracking OTP...");
+
+            try {
+                const response = await fetch(config.resendEndpoint, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+                const payload = await response.json();
+
+                if (!response.ok || !payload.success) {
+                    showBanner("error", payload.message || "Could not resend OTP.");
+                    if (payload.redirect_url) {
+                        window.setTimeout(() => {
+                            window.location.href = payload.redirect_url;
+                        }, 1200);
+                    }
+                    return;
+                }
+
+                setCountdown(payload.cooldown_seconds || 45);
+                setOtpDigits(Array(6).fill(""));
+                showBanner("success", payload.message || "A new OTP has been sent.");
+                inputRefs.current[0]?.focus();
+            } catch (error) {
+                showBanner("error", "Network issue while resending OTP. Please try again.");
+            } finally {
+                setResending(false);
+            }
+        }
+
+        const bannerStyles = {
+            info: "border-fintech-100 bg-fintech-50 text-fintech-800",
+            success: "border-emerald-200 bg-emerald-50 text-emerald-700",
+            error: "border-rose-200 bg-rose-50 text-rose-700"
+        };
+
+        return (
+            <div className="mx-auto max-w-xl">
+                <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-blue-100/90">
+                    <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-r from-fintech-900 via-fintech-800 to-fintech-700 opacity-95"></div>
+
+                    <div className="relative px-7 pb-8 pt-7 sm:px-10 sm:pb-10">
+                        <div className="mt-2 flex items-center gap-4 text-white">
+                            <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
+                                <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                    <path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z" />
+                                    <path d="M9 12l2 2 4-4" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium text-fintech-100">CreditLens Customer Portal</p>
+                                <h1 className="text-2xl font-semibold tracking-tight">Tracking OTP Verification</h1>
+                            </div>
+                        </div>
+
+                        <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-slate-700">
+                            <p className="text-sm sm:text-base">
+                                We have sent a 6-digit verification code to your registered email address.
+                            </p>
+                            <p className="mt-1 text-sm font-semibold text-fintech-800 break-all">{config.customerEmail}</p>
+                            <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Application ID: <span className="text-fintech-900">{config.applicationRef}</span>
+                            </p>
+                        </div>
+
+                        {banner && (
+                            <div className={`mt-5 rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-300 ${bannerStyles[banner.type] || bannerStyles.info}`}>
+                                {banner.message}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleVerify} className="mt-7">
+                            <div className="flex items-center justify-between gap-2 sm:gap-3">
+                                {otpDigits.map((digit, index) => (
+                                    <input
+                                        key={index}
+                                        ref={(element) => { inputRefs.current[index] = element; }}
+                                        value={digit}
+                                        inputMode="numeric"
+                                        autoComplete="one-time-code"
+                                        maxLength={6}
+                                        onChange={(event) => handleOtpInput(index, event.target.value)}
+                                        onKeyDown={(event) => handleKeyDown(event, index)}
+                                        className="h-12 w-12 rounded-xl border border-slate-300 bg-white text-center text-xl font-bold text-fintech-900 outline-none transition-all duration-200 hover:border-fintech-600 focus:border-fintech-700 focus:ring-2 focus:ring-fintech-100 sm:h-14 sm:w-14"
+                                    />
+                                ))}
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={!isOtpComplete || verifying}
+                                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-fintech-800 px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-fintech-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500"
+                            >
+                                {verifying ? (
+                                    <>
+                                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                                        Verifying...
+                                    </>
+                                ) : "View Application Status"}
+                            </button>
+                        </form>
+
+                        <div className="mt-6 flex flex-col items-center gap-2 text-center text-sm text-slate-600">
+                            <button
+                                type="button"
+                                onClick={handleResend}
+                                disabled={countdown > 0 || resending}
+                                className="font-semibold text-fintech-700 transition-colors duration-200 hover:text-fintech-600 disabled:cursor-not-allowed disabled:text-slate-400"
+                            >
+                                {resending ? "Resending..." : "Resend OTP"}
+                            </button>
+                            {countdown > 0 && (
+                                <p className="text-xs text-slate-500">You can resend OTP in {formatCountdown(countdown)}</p>
+                            )}
+                            <a href={config.backUrl} className="mt-2 text-xs font-medium text-slate-500 underline decoration-slate-300 transition hover:text-slate-700">
+                                Back to Track Application
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    ReactDOM.createRoot(document.getElementById("tracking-otp-root")).render(<TrackingOtpApp />);
+</script>
 {% endblock %}
