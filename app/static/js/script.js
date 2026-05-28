@@ -1,4 +1,15 @@
 document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("applicationSearch");
+    const table = document.getElementById("applicationsTable");
+    if (searchInput && table) {
+        searchInput.addEventListener("input", function () {
+            const query = searchInput.value.toLowerCase();
+            table.querySelectorAll("tbody tr").forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(query) ? "" : "none";
+            });
+        });
+    }
+
     // Run only on pages that contain the loan multi-step form
     const form = document.getElementById("loanApplicationForm");
     if (!form) return;
@@ -102,6 +113,20 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    function updateCompletion() {
+        const fields = Array.from(form.querySelectorAll("input, select"));
+        const requiredFields = fields.filter(field => field.required);
+        const completed = requiredFields.filter(field => field.value && field.value.trim() !== "").length;
+        const percent = requiredFields.length ? Math.round((completed / requiredFields.length) * 100) : 0;
+        const percentTarget = document.getElementById("completionPercent");
+        const barTarget = document.getElementById("completionBar");
+        if (percentTarget) percentTarget.textContent = `${percent}%`;
+        if (barTarget) barTarget.style.width = `${percent}%`;
+    }
+
+    form.addEventListener("input", updateCompletion);
+    form.addEventListener("change", updateCompletion);
+
     if (nextStep1) {
         nextStep1.addEventListener("click", function () {
             if (validateStep(step1)) {
@@ -133,4 +158,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Start on Step 1
     showStep(1);
+    updateCompletion();
 });

@@ -39,6 +39,42 @@
                 Risk: {{ risk_level }}
             </div>
         </div>
+        {% if risk_score is not none %}
+        <p class="decision-subtext" style="margin-top:8px;">Risk Score: {{ "{:.2f}".format(risk_score) }}</p>
+        {% endif %}
+    </div>
+
+    <div class="result-panel" id="nlp-explanation-panel">
+        <h3>NLP Decision Explanation</h3>
+        <div id="nlp-loading" class="nlp-loading">
+            <span class="nlp-spinner"></span>
+            <span>Generating personalized financial explanation...</span>
+        </div>
+        <div id="nlp-content" class="nlp-content" style="display:none;">
+            <div class="nlp-badges-row">
+                <span class="status-badge {% if result == 'Approved' %}status-approved{% else %}status-rejected{% endif %}" id="nlp-result-badge">
+                    {{ result }}
+                </span>
+                <span class="risk-badge {% if risk_level == 'Low' %}risk-low{% elif risk_level == 'Medium' %}risk-medium{% else %}risk-high{% endif %}" id="nlp-risk-badge">
+                    Risk: {{ risk_level }}
+                </span>
+            </div>
+            <p id="nlp-explanation-text"></p>
+            <p id="nlp-financial-analysis"></p>
+            <p id="nlp-risk-explanation"></p>
+            <p id="nlp-confidence-summary"></p>
+            <div class="result-sections">
+                <div class="result-panel">
+                    <h3>Improvement Suggestions</h3>
+                    <ul class="reason-list" id="nlp-suggestions-list"></ul>
+                </div>
+                <div class="result-panel">
+                    <h3>Smart Financial Tips</h3>
+                    <ul class="reason-list" id="nlp-smart-tips-list"></ul>
+                </div>
+            </div>
+        </div>
+        <div id="nlp-error" class="alert alert-error" style="display:none;"></div>
     </div>
 
     <div class="result-sections">
@@ -73,4 +109,81 @@
         {% endif %}
     </div>
 </div>
+
+<script id="nlp-bootstrap" type="application/json">{{ {
+    "application_id": application_id|default(None),
+    "result": result,
+    "risk_level": risk_level,
+    "risk_score": risk_score|default(None),
+    "confidence_score": confidence_score|default(None),
+    "nlp_explanation": nlp_explanation|default(None)
+} | tojson }}</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const configRaw = document.getElementById("nlp-bootstrap");
+    if (!configRaw) return;
+
+    const data = JSON.parse(configRaw.textContent || "{}");
+    const loadingEl = document.getElementById("nlp-loading");
+    const contentEl = document.getElementById("nlp-content");
+    const errorEl = document.getElementById("nlp-error");
+
+    function populate(payload) {
+        if (!payload) return;
+        document.getElementById("nlp-explanation-text").textContent = payload.explanation_text || "";
+        document.getElementById("nlp-financial-analysis").textContent = payload.financial_analysis || "";
+        document.getElementById("nlp-risk-explanation").textContent = payload.risk_explanation || "";
+        document.getElementById("nlp-confidence-summary").textContent = payload.confidence_summary || "";
+
+        const suggestions = payload.suggestions || [];
+        const tips = payload.smart_tips || [];
+
+        const suggestionList = document.getElementById("nlp-suggestions-list");
+        const tipsList = document.getElementById("nlp-smart-tips-list");
+        suggestionList.innerHTML = "";
+        tipsList.innerHTML = "";
+
+        suggestions.forEach(function (item) {
+            const li = document.createElement("li");
+            li.textContent = item;
+            suggestionList.appendChild(li);
+        });
+        tips.forEach(function (item) {
+            const li = document.createElement("li");
+            li.textContent = item;
+            tipsList.appendChild(li);
+        });
+    }
+
+    async function fetchExplanation() {
+        if (!data.application_id) {
+            loadingEl.style.display = "none";
+            return;
+        }
+        try {
+            const response = await fetch(`/api/explanation/${data.application_id}?lang=en`);
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                throw new Error(payload.message || "Explanation could not be generated.");
+            }
+            populate(payload.explanation);
+            loadingEl.style.display = "none";
+            contentEl.style.display = "block";
+        } catch (error) {
+            loadingEl.style.display = "none";
+            errorEl.textContent = error.message || "Explanation is currently unavailable.";
+            errorEl.style.display = "block";
+        }
+    }
+
+    if (data.nlp_explanation) {
+        populate(data.nlp_explanation);
+        loadingEl.style.display = "none";
+        contentEl.style.display = "block";
+    } else {
+        fetchExplanation();
+    }
+});
+</script>
 {% endblock %}

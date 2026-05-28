@@ -25,11 +25,25 @@
             {% if session.get('role') == 'credit_manager' %}
             <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
             {% endif %}
+            <a href="{{ url_for('tracking.track_application') }}">Track Application</a>
+            {% if session.get('user_id') %}
             <a href="{{ url_for('auth.logout') }}">Logout</a>
+            {% else %}
+            <a href="{{ url_for('auth.login') }}">Staff Login</a>
+            {% endif %}
         </div>
     </nav>
 
     <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-stack">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
         {% block content %}{% endblock %}
     </main>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>

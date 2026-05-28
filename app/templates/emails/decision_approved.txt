@@ -1,0 +1,25 @@
+CreditLens Loan Application Update
+
+Hello {{ customer_name }},
+
+Your loan application has been approved after our credit and repayment evaluation.
+
+Approved Loan Amount: INR {{ "{:,.0f}".format(approved_loan_amount) }}
+Interest Rate: {{ "{:.2f}".format(interest_rate) }}%
+Proposed Loan Tenure: {{ loan_tenure_months }} months
+Loan Purpose: {{ loan_intent }}
+
+Next verification steps:
+- Log in to the secure CreditLens portal and review your application summary.
+- Upload requested KYC or income documents for compliance checks.
+- Complete e-sign confirmation to proceed with disbursement processing.
+
+Secure Portal: {{ portal_url }}
+
+Support:
+Email: {{ support_email }}
+Phone: {{ support_phone }}
+Hours: {{ support_hours }}
+
+Regards,
+CreditLens Support

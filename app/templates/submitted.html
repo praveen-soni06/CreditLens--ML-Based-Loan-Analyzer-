@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Application Submitted | CreditLens{% endblock %}
+
+{% block content %}
+<div class="enterprise-shell">
+    <section class="submission-hero glass-panel">
+        <span class="eyebrow">CreditLens Underwriting Intake</span>
+        <h1>Application successfully submitted for credit underwriting review.</h1>
+        <p>{{ message }}</p>
+
+        <div class="application-id-box">
+            <span>Application ID</span>
+            <strong>{{ application_ref }}</strong>
+        </div>
+
+        <div class="submission-actions">
+            {% if verify_url %}
+            <a href="{{ verify_url }}" class="primary-btn">Verify Customer Email</a>
+            {% endif %}
+            <a href="{{ url_for('tracking.track_application') }}" class="secondary-btn">Track Application</a>
+            <a href="{{ url_for('predict.application') }}" class="secondary-btn">New Application</a>
+        </div>
+
+        {% if delivery_notice %}
+        <div class="alert alert-info">{{ delivery_notice }}</div>
+        {% endif %}
+        {% if dev_verification_code %}
+        <div class="alert alert-info">Dev OTP: <strong>{{ dev_verification_code }}</strong></div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
