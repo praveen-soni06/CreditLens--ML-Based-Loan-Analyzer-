@@ -1,122 +1,97 @@
 # 🏦 CreditLens – ML-Based Loan Analyzer
 
-**An intelligent machine learning-powered loan analysis system that predicts loan approval outcomes using applicant financial and demographic data, with an intuitive Flask-based web interface.**
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-Web%20Framework-brightgreen?logo=flask)
+![XGBoost](https://img.shields.io/badge/XGBoost-ML%20Model-orange)
+![SQLite](https://img.shields.io/badge/SQLite-Database-lightblue?logo=sqlite)
+![License](https://img.shields.io/badge/License-Open%20Source-green)
+
+**CreditLens** is an intelligent machine learning-powered loan analysis system that predicts loan approval outcomes using applicant financial and demographic data. It combines XGBoost classification models with an intuitive Flask-based web interface, multi-role user management, AI-powered explanations, and comprehensive application tracking for financial institutions.
 
 ---
 
 ## 📋 Overview
 
-CreditLens is a comprehensive loan decision support system designed for financial institutions and loan service providers. It combines machine learning-powered loan predictions with a user-friendly web interface, comprehensive applicant tracking, and advanced decision explanations powered by AI models or rule-based analysis.
+CreditLens addresses the critical need for fast, consistent, and explainable loan decisions. Financial institutions face challenges in automating initial screening while maintaining compliance and fairness. This system bridges that gap by:
 
-### What It Does
-- **Automated Loan Predictions**: Predicts loan approval outcomes using XGBoost classification models trained on historical loan data
-- **Risk Assessment**: Calculates and categorizes loan applicant risk levels based on financial and demographic factors
-- **AI-Powered Explanations**: Generates human-readable explanations for loan decisions using Google Gemini or Hugging Face LLMs (with fallback to rule-based explanations)
-- **Application Tracking**: Applicants can track their loan application status in real-time
-- **Admin Dashboard**: Credit managers can review, approve, reject, or hold applications with detailed analytics
-- **Email Notifications**: Sends automated status updates and decision notifications to applicants
-- **Multi-Role Support**: Supports two user roles: Loan Assistants (submit applications) and Credit Managers (review decisions)
+- **Automating loan decisions** using machine learning models trained on historical data
+- **Generating human-readable explanations** powered by Google Gemini or Hugging Face LLMs
+- **Supporting multi-role workflows** with separate portals for loan assistants, credit managers, and applicants
+- **Maintaining full audit trails** with email notifications and real-time status tracking
 
-### Why It Was Built
-Financial institutions need to make fast, consistent, and fair loan decisions while maintaining compliance and explainability. CreditLens bridges this gap by automating initial screening with machine learning while preserving human oversight through an intuitive dashboard.
+The system is production-ready with role-based access control, persistent data storage via SQLAlchemy ORM, and configurable AI providers for decision explanations.
 
 ### Key Features
-✨ **Machine Learning Predictions** – XGBoost-based model with SMOTE-balanced training data  
-🔐 **User Authentication** – Multi-role access control (Loan Assistants & Credit Managers)  
-📊 **Advanced Analytics** – Comprehensive dashboard with real-time metrics and decision tracking  
-🤖 **AI Decision Explanations** – Google Gemini or Hugging Face integration for natural language explanations  
-📧 **Email Notifications** – Automated applicant communications with verification codes  
-🔍 **Application Tracking** – Applicants can monitor their loan status with timeline events  
-📈 **Risk Scoring** – Multi-factor risk assessment with categorization  
-⚡ **SQLite Database** – Persistent storage with relational models for users, applications, predictions, and audit logs  
-🎨 **Responsive UI** – Modern Flask templates with Bootstrap styling
+
+✨ **Machine Learning Predictions** – XGBoost-based binary classification with SMOTE-balanced training  
+🔐 **Multi-Role Authentication** – Session-based auth with credit manager and loan assistant roles  
+📊 **Admin Dashboard** – Real-time metrics, application filtering, decision management, and analytics  
+🤖 **AI Decision Explanations** – Google Gemini or Hugging Face integration with fallback to rule-based explanations  
+📧 **Email Notifications** – Automated status updates to applicants with verification codes  
+🔍 **Application Tracking Portal** – Applicants monitor loan status with event timeline  
+📈 **Risk Scoring** – Multi-factor risk assessment with Low/Medium/High categorization  
+💾 **SQLite Persistence** – Relational database with models for users, applications, predictions, verifications, and audit logs  
+🎨 **Responsive UI** – Bootstrap-based Flask templates with form validation
 
 ---
 
-## 🎬 Demo
+## 🏗️ Architecture
 
-### Live Demo
-[Coming Soon]
+CreditLens follows a modular, layered architecture:
 
-### Screenshots
+```
+┌─────────────────────────────────────┐
+│   Flask Web Application             │
+│  (Login, Forms, Dashboard, Tracking)│
+└──────────────┬──────────────────────┘
+               │
+┌──────────────▼──────────────────────┐
+│   Business Logic Layer              │
+│  (Prediction, Email, Explanations)  │
+└──────────────┬──────────────────────┘
+               │
+┌──────────────▼──────────────────────┐
+│   ML Pipeline                       │
+│  (XGBoost Model + Scaler)           │
+└──────────────┬──────────────────────┘
+               │
+┌──────────────▼──────────────────────┐
+│   External Services                 │
+│  (Gemini/HF APIs, SMTP Email)       │
+└─────────────────────────────────────┘
+               │
+┌──────────────▼──────────────────────┐
+│   SQLAlchemy ORM Layer              │
+│  (SQLite Database)                  │
+└─────────────────────────────────────┘
+```
 
-#### Home Page / Application Form
-![Application Form](docs/images/application-form.png)
+### Data Flow
 
-#### Prediction Results
-![Prediction Results](docs/images/prediction-results.png)
-
-#### Admin Dashboard
-![Admin Dashboard](docs/images/admin-dashboard.png)
-
-#### Tracking Status
-![Application Tracking](docs/images/tracking-status.png)
-
-*Screenshots placeholder – Add actual screenshots to `docs/images/` directory*
-
-### Video Demo
-[Coming Soon]
+1. **Application Submission** → Loan Assistant submits form → Backend validation → Feature preprocessing
+2. **ML Prediction** → XGBoost inference → Confidence & risk score calculation
+3. **Explanation Generation** → AI provider (Gemini/HF) generates human-readable explanation
+4. **Database Storage** → Application, prediction, explanation saved
+5. **Admin Review** → Credit Manager reviews in dashboard → Approves/Rejects/Holds
+6. **Notification** → Email sent to applicant with decision & explanation
+7. **Tracking** → Applicant verifies email → Accesses tracking portal → Views status timeline
 
 ---
 
 ## ⚙️ Tech Stack
 
-### **Frontend**
-- Flask (Web Framework)
-- HTML5
-- CSS3
-- JavaScript (Vanilla & Bootstrap)
-
-### **Backend**
-- Flask (Python Web Framework)
-- Flask-SQLAlchemy (ORM)
-- SQLite (Database)
-
-### **Machine Learning / AI**
-- XGBoost (Classification Model)
-- Scikit-Learn (Model evaluation & preprocessing)
-- Imbalanced-Learn (SMOTE for data balancing)
-- Pandas & NumPy (Data manipulation)
-- Google Gemini API (NLP Explanations)
-- Hugging Face API (Alternative NLP Provider)
-
-### **Database**
-- SQLite 3 (Lightweight relational database)
-- SQLAlchemy ORM (Database abstraction)
-
-### **APIs & Integrations**
-- Google Gemini API (AI Explanations)
-- Hugging Face Inference API (Alternative AI Explanations)
-- SMTP (Email notifications)
-
-### **Authentication**
-- Session-based authentication
-- Role-based access control (RBAC)
-
-### **Deployment**
-- Python WSGI application
-- Flask development server (development)
-- Gunicorn/uWSGI ready (production)
-
-### **Programming Languages**
-- Python 3.8+
-- HTML/CSS/JavaScript
-
-### **Libraries & Tools**
-- **Flask**: Web framework
-- **python-dotenv**: Environment variable management
-- **xgboost**: Machine learning model
-- **scikit-learn**: ML utilities
-- **pandas**: Data manipulation
-- **numpy**: Numerical computing
-- **imbalanced-learn**: Class balancing
-- **flask-sqlalchemy**: Database ORM
-- **joblib**: Model serialization
-
-### **Development Tools**
-- Git (Version control)
-- Jupyter Notebook (ML model training & analysis)
-- PyCharm IDE compatible
+| Component | Technology |
+|-----------|-----------|
+| **Backend Framework** | Flask (Python web framework) |
+| **ML Model** | XGBoost (binary classification) |
+| **Data Processing** | Pandas, NumPy, Scikit-Learn, Imbalanced-Learn (SMOTE) |
+| **Database** | SQLite 3 with SQLAlchemy ORM |
+| **Frontend** | HTML5, CSS3, JavaScript, Bootstrap |
+| **Email Service** | SMTP (Gmail, custom providers) |
+| **AI Providers** | Google Gemini API, Hugging Face Inference API |
+| **Serialization** | Joblib (model/scaler persistence) |
+| **Model Training** | Jupyter Notebook (notebooks/training.ipynb) |
+| **Environment** | python-dotenv (configuration management) |
 
 ---
 
@@ -125,115 +100,129 @@ Financial institutions need to make fast, consistent, and fair loan decisions wh
 ```
 CreditLens--ML-Based-Loan-Analyzer-/
 ├── app/                                 # Flask application package
-│   ├── __init__.py                      # App factory & initialization
+│   ├── __init__.py                      # App factory, database init, blueprint registration
 │   ├── database/
-│   │   └── db.py                        # Database models (User, Application, Prediction, etc.)
+│   │   └── db.py                        # SQLAlchemy models (User, Application, Prediction, etc.)
 │   ├── routes/
-│   │   ├── auth.py                      # Authentication (login/logout)
-│   │   ├── main.py                      # Home page routes
-│   │   ├── predict.py                   # Loan application form & prediction
+│   │   ├── auth.py                      # Login/logout endpoints
+│   │   ├── main.py                      # Home page route
+│   │   ├── predict.py                   # Loan application form & prediction submission
 │   │   ├── dashboard.py                 # Admin dashboard & decision management
-│   │   └── tracking.py                  # Application status tracking
+│   │   └── tracking.py                  # Applicant status tracking portal
 │   ├── templates/
-│   │   ├── base.html                    # Base template
+│   │   ├── base.html                    # Base template (header, nav, footer)
 │   │   ├── index.html                   # Home page
-│   │   ├── login.html                   # Login page
-│   │   ├── dashboard.html               # Admin dashboard
+│   │   ├── login.html                   # Authentication page
+│   │   ├── dashboard.html               # Credit manager dashboard
 │   │   ├── review.html                  # Application review interface
-│   │   ├── result.html                  # Prediction results
-│   │   ├── submitted.html               # Application submitted confirmation
-│   │   ├── track.html                   # Application tracking page
+│   │   ├── result.html                  # Prediction results page
+│   │   ├── submitted.html               # Application confirmation
+│   │   ├── track.html                   # Tracking portal entry
 │   │   ├── track_verify.html            # Email verification for tracking
-│   │   ├── tracking_status.html         # Tracking status display
+│   │   ├── tracking_status.html         # Status display with timeline
 │   │   ├── verify_email.html            # Email verification page
-│   │   └── emails/                      # Email templates
+│   │   └── emails/                      # Email templates for notifications
 │   ├── static/
-│   │   ├── css/                         # Stylesheets
-│   │   ├── js/                          # JavaScript files
+│   │   ├── css/                         # Stylesheets (Bootstrap customizations)
+│   │   ├── js/                          # Client-side JavaScript
 │   │   └── images/                      # Images & assets
 │   └── utils/
-│       ├── email_utils.py               # Email sending & verification
-│       ├── nlp_explainer.py             # AI explanation generation (Gemini/HF)
-│       └── lifecycle.py                 # Application lifecycle management
+│       ├── email_utils.py               # SMTP email sending, verification code generation
+│       ├── nlp_explainer.py             # AI explanation generation (Gemini/HF APIs)
+│       └── lifecycle.py                 # Application status lifecycle management
 │
-├── ML/                                  # Machine Learning models & data
-│   ├── loan_data.csv                    # Training dataset
-│   ├── model.pkl                        # Trained XGBoost model
-│   └── scaler.pkl                       # Feature scaler
+├── ML/                                  # Machine Learning assets
+│   ├── loan_data.csv                    # Training dataset (~3.6MB)
+│   ├── model.pkl                        # Serialized XGBoost model
+│   └── scaler.pkl                       # Serialized feature scaler (StandardScaler)
 │
 ├── notebooks/
-│   └── training.ipynb                   # Model training & evaluation notebook
+│   └── training.ipynb                   # Jupyter notebook for model training & evaluation
 │
-├── Dataset/                             # Additional datasets (if any)
-│
-├── instance/                            # Instance folder (database, cache)
-│   └── CreditLens.db                    # SQLite database (generated)
+├── instance/                            # Runtime instance data (created at first run)
+│   └── CreditLens.db                    # SQLite database (auto-generated)
 │
 ├── .env.example                         # Environment variables template
-├── .flaskenv                            # Flask environment config
+├── .flaskenv                            # Flask environment configuration
 ├── .gitignore                           # Git ignore rules
-├── requirements.txt                     # Python dependencies
+├── requirements.txt                     # Python package dependencies
 ├── run.py                               # Application entry point
 └── README.md                            # This file
-
 ```
 
 ### Key Directories Explained
 
 | Directory | Purpose |
 |-----------|---------|
-| `app/` | Main Flask application with routes, templates, database models, and utilities |
-| `app/routes/` | API route handlers for authentication, prediction, dashboard, and tracking |
+| `app/` | Main Flask application package with all routes, templates, database models |
+| `app/routes/` | Endpoint handlers for authentication, prediction, dashboard, tracking |
 | `app/templates/` | Jinja2 HTML templates for UI rendering |
 | `app/static/` | CSS, JavaScript, and image assets |
-| `app/utils/` | Utility modules for email, NLP explanations, and lifecycle management |
-| `app/database/` | SQLAlchemy ORM models defining database schema |
-| `ML/` | Pre-trained machine learning models and training data |
-| `notebooks/` | Jupyter notebooks for model training and analysis |
+| `app/utils/` | Helper modules for email, NLP explanations, lifecycle management |
+| `app/database/` | SQLAlchemy ORM model definitions (schema) |
+| `ML/` | Pre-trained XGBoost model, feature scaler, training data |
+| `notebooks/` | Jupyter notebook for model training, evaluation, hyperparameter tuning |
+| `instance/` | Runtime files (SQLite database, generated at startup) |
 
 ---
 
 ## 🚀 Installation
 
-Follow these steps to set up CreditLens on your local machine:
-
 ### Prerequisites
-- **Python 3.8 or higher**
-- **pip** (Python package manager)
-- **Git**
-- **Virtual Environment** (recommended)
 
-### Step 1: Clone the Repository
+- **Python 3.8+** (tested on Python 3.8, 3.9, 3.10, 3.11)
+- **pip** (Python package manager)
+- **Git** (for cloning)
+- **Virtual Environment** (highly recommended)
+
+### Step 1: Clone Repository
+
 ```bash
 git clone https://github.com/praveen-soni06/CreditLens--ML-Based-Loan-Analyzer-.git
 cd CreditLens--ML-Based-Loan-Analyzer-
 ```
 
-### Step 2: Create and Activate Virtual Environment
+### Step 2: Create & Activate Virtual Environment
+
+**Linux/macOS:**
 ```bash
-# On Linux/macOS
 python3 -m venv venv
 source venv/bin/activate
+```
 
-# On Windows
+**Windows:**
+```bash
 python -m venv venv
 venv\Scripts\activate
 ```
 
 ### Step 3: Install Python Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 4: Configure Environment Variables
-Copy the example environment file and update with your settings:
+Installed packages:
+- Flask – Web framework
+- python-dotenv – Environment configuration
+- xgboost – ML model
+- scikit-learn – ML utilities
+- pandas – Data manipulation
+- numpy – Numerical computing
+- imbalanced-learn – SMOTE balancing
+- flask-sqlalchemy – Database ORM
+- joblib – Model serialization
+
+### Step 4: Configure Environment
+
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` with your configuration:
+Edit `.env` with your settings:
+
 ```env
-# Email Configuration
+# SMTP Email Configuration (for Gmail)
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=465
 EMAIL_USE_SSL=True
@@ -242,94 +231,57 @@ EMAIL_HOST_PASSWORD=your-app-password
 EMAIL_SENDER=your-email@gmail.com
 EMAIL_SENDER_NAME=CreditLens Support
 
-# AI Configuration (Optional)
-GEMINI_API_KEY=your-gemini-api-key
-HUGGINGFACEHUB_API_TOKEN=your-hf-token
-NLP_PROVIDER=auto  # Options: auto, gemini, huggingface, none
+# Development: save emails locally if SMTP unavailable
+EMAIL_DEV_OUTBOX=True
+EMAIL_FALLBACK_TO_OUTBOX=True
 
-# Application Settings
+# Support contact (displayed in emails/UI)
+SUPPORT_EMAIL=support@creditlens.com
+SUPPORT_PHONE=+91-00000-00000
+SUPPORT_HOURS=Mon-Fri, 9:00 AM to 6:00 PM
+
+# Application URLs
+PORTAL_LOGIN_URL=http://127.0.0.1:5000/login
 DEFAULT_LOAN_TENURE_MONTHS=36
 MODEL_APPROVAL_CLASS_LABEL=0
-PORTAL_LOGIN_URL=http://127.0.0.1:5000/login
+
+# AI Provider Configuration (optional)
+NLP_PROVIDER=auto  # Options: auto, gemini, huggingface, none
+GEMINI_API_KEY=your-gemini-api-key
+GEMINI_MODEL_NAME=gemini-1.5-flash
+HUGGINGFACEHUB_API_TOKEN=your-hf-token
+HF_MODEL_NAME=mistralai/Mistral-7B-Instruct-v0.2
 ```
 
+**Gmail Setup:**
+1. Enable 2-Step Verification in Google Account settings
+2. Generate app-specific password: https://myaccount.google.com/apppasswords
+3. Use the generated password in `EMAIL_HOST_PASSWORD`
+
 ### Step 5: Initialize Database
-The database is automatically created when you first run the application, but you can manually initialize it:
+
+The database is automatically created on first run. Manual initialization (optional):
+
 ```bash
 python -c "from app import create_app; create_app()"
 ```
 
-### Step 6: Start the Flask Application
-```bash
-# Development mode with auto-reload
-python run.py
+This creates `instance/CreditLens.db` and seeds demo users.
 
-# Or using Flask CLI
-flask run
+### Step 6: Run Application
+
+```bash
+python run.py
 ```
 
-The application will be available at: **http://127.0.0.1:5000**
+The application starts at **http://127.0.0.1:5000**
 
 ### Step 7: Verify Installation
-1. Open your browser and navigate to `http://localhost:5000`
+
+1. Open browser to `http://localhost:5000`
 2. Login with demo credentials:
-   - **Email**: `admin@creditlens.com` | **Password**: `admin123` (Credit Manager)
-   - **Email**: `assistant@creditlens.com` | **Password**: `assistant123` (Loan Assistant)
-
----
-
-## 🔐 Environment Variables
-
-| Variable | Description | Required | Default |
-|----------|-------------|----------|---------|
-| `SECRET_KEY` | Flask secret key for session encryption | No | `Ex_Tracker` |
-| `EMAIL_HOST` | SMTP server hostname | No | `smtp.gmail.com` |
-| `EMAIL_PORT` | SMTP server port | No | `465` |
-| `EMAIL_USE_SSL` | Use SSL for email | No | `True` |
-| `EMAIL_HOST_USER` | Email account for sending | Yes (if emails enabled) | - |
-| `EMAIL_HOST_PASSWORD` | Email account password or app password | Yes (if emails enabled) | - |
-| `EMAIL_SENDER` | Sender email address | No | Auto-detected from HOST_USER |
-| `EMAIL_SENDER_NAME` | Sender display name | No | `CreditLens Support` |
-| `EMAIL_DEV_OUTBOX` | Save emails locally in development | No | `True` |
-| `EMAIL_FALLBACK_TO_OUTBOX` | Fallback to local save if SMTP fails | No | `True` |
-| `SUPPORT_EMAIL` | Support contact email | No | Auto-detected |
-| `SUPPORT_PHONE` | Support phone number | No | `+91-00000-00000` |
-| `SUPPORT_HOURS` | Support hours display | No | `Mon-Fri, 9:00 AM to 6:00 PM` |
-| `PORTAL_LOGIN_URL` | Portal login URL for emails | No | `http://127.0.0.1:5000/login` |
-| `DEFAULT_LOAN_TENURE_MONTHS` | Default loan term in months | No | `36` |
-| `MODEL_APPROVAL_CLASS_LABEL` | Class label for approval in model | No | `0` |
-| `NLP_PROVIDER` | AI provider for explanations | No | `auto` |
-| `GEMINI_API_KEY` | Google Gemini API key | No (if using Gemini) | - |
-| `GEMINI_MODEL_NAME` | Gemini model version | No | `gemini-1.5-flash` |
-| `HUGGINGFACEHUB_API_TOKEN` | Hugging Face API token | No (if using HF) | - |
-| `HF_MODEL_NAME` | Hugging Face model name | No | `mistralai/Mistral-7B-Instruct-v0.2` |
-
----
-
-## 📋 Requirements
-
-### System Requirements
-- **Python Version**: 3.8 or higher
-- **Operating System**: Linux, macOS, or Windows
-- **RAM**: 2GB minimum (4GB recommended for model training)
-- **Disk Space**: 500MB (including model files and database)
-
-### Optional Requirements
-- **CUDA/GPU**: Not required but speeds up model training
-- **Google Gemini API**: For AI-powered decision explanations (free tier available)
-- **Hugging Face API**: Alternative AI provider for explanations
-
-### Python Package Requirements
-See `requirements.txt`:
-- Flask
-- python-dotenv
-- xgboost
-- scikit-learn
-- pandas
-- numpy
-- imbalanced-learn
-- flask-sqlalchemy
-- joblib
+   - **Email:** `admin@creditlens.com` | **Password:** `admin123` (Credit Manager)
+   - **Email:** `assistant@creditlens.com` | **Password:** `assistant123` (Loan Assistant)
 
 ---
 
@@ -337,76 +289,73 @@ See `requirements.txt`:
 
 ### For Loan Assistants
 
-#### 1. **Login**
+**1. Login**
 - Navigate to `http://localhost:5000/login`
-- Enter credentials: `assistant@creditlens.com` / `assistant123`
+- Enter: `assistant@creditlens.com` / `assistant123`
 
-#### 2. **Submit a Loan Application**
-- Click on "New Application"
+**2. Submit Application**
+- Click "New Application" button
 - Fill in applicant details:
-  - Personal Information (Age, Gender, Education, Income, Employment Experience)
-  - Home Ownership status
-  - Loan Details (Amount, Intent, Interest Rate)
-  - Credit Information (Credit Score, History Length, Previous Defaults)
+  - Personal: Age, Gender, Education, Annual Income, Employment Experience
+  - Home Ownership: OWN, RENT, MORTGAGE, or OTHER
+  - Loan Details: Amount, Purpose (PERSONAL, EDUCATION, MEDICAL, VENTURE, HOMEIMPROVEMENT, DEBTCONSOLIDATION)
+  - Credit Info: Credit Score, Credit History Length, Previous Loan Defaults
 - Click "Submit Application"
 
-#### 3. **View Results**
-- After submission, the ML model predicts the outcome
-- Review decision, risk score, and confidence level
-- AI-generated explanation appears on results page
+**3. View Results**
+- See ML prediction (Approved/Rejected)
+- Review confidence score and risk category
+- Read AI-generated explanation of decision
 
-#### 4. **Applicant Verification**
+**4. Applicant Notification**
 - Applicant receives verification email with tracking link
-- Applicant verifies email to unlock tracking
+- Applicant can access tracking portal after email verification
 
 ### For Credit Managers
 
-#### 1. **Login**
+**1. Login**
 - Navigate to `http://localhost:5000/login`
-- Enter credentials: `admin@creditlens.com` / `admin123`
+- Enter: `admin@creditlens.com` / `admin123`
 
-#### 2. **Access Dashboard**
-- View all submitted applications
-- See analytics: total applications, approval rate, risk distribution
-- Filter applications by status (Submitted, Underwriting, Approved, Rejected)
+**2. Access Dashboard**
+- View key metrics: Total applications, Approval rate, Risk distribution
+- Filter by status: Submitted, Underwriting, Approved, Rejected, Hold
 
-#### 3. **Review Applications**
-- Click on an application to view details
-- Review ML decision, risk assessment, and explanation
-- View applicant information and timeline
+**3. Review Applications**
+- Click application to view full details
+- Review ML decision, risk score, and AI explanation
+- View applicant information and submission timeline
 
-#### 4. **Make Decisions**
-- Approve, Reject, or Hold application
-- Add remarks/comments for audit trail
-- Decision is recorded with timestamp
+**4. Make Decision**
+- Choose: Approve, Reject, or Hold
+- Add optional remarks/comments for audit trail
+- Decision recorded with timestamp and credit manager name
 
-#### 5. **Send Notifications**
-- System automatically sends decision emails to applicants
-- Emails include personalized explanations
+**5. Send Notifications**
+- System automatically sends decision email to applicant
+- Email includes decision, explanation, and next steps
 
-### For Applicants (Tracking)
+### For Applicants (Tracking Portal)
 
-#### 1. **Access Tracking Portal**
+**1. Access Tracking**
 - Navigate to `http://localhost:5000/track`
 - Enter Application Reference ID
 - Verify email with code sent to applicant email
 
-#### 2. **View Application Status**
-- See current status (Submitted, Under Review, Approved, Rejected)
-- View timeline of all events/updates
-- See decision details if available
+**2. View Status**
+- See current application status
+- Browse timeline of all status updates
+- View final decision and explanation (if available)
 
 ---
 
-## 🔌 API Documentation
-
-CreditLens provides backend routes for loan prediction and application management:
+## 🔌 API Endpoints
 
 ### Authentication Routes
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET/POST | `/login` | User login page & form handler |
+| GET/POST | `/login` | User login |
 | GET | `/logout` | User logout |
 
 ### Main Routes
@@ -419,31 +368,31 @@ CreditLens provides backend routes for loan prediction and application managemen
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET/POST | `/application` | Loan application form |
-| POST | `/submit-application` | Submit application for prediction |
-| GET | `/result/<ref_id>` | View prediction results |
+| GET/POST | `/application` | Loan application form page |
+| POST | `/submit-application` | Submit application for ML prediction |
+| GET | `/result/<ref_id>` | View prediction results for application |
 
-### Dashboard Routes
+### Dashboard Routes (Credit Manager Only)
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/dashboard` | Admin dashboard (Credit Manager only) |
-| GET | `/dashboard/applications` | List all applications (JSON) |
-| GET | `/dashboard/application/<app_id>` | Get application details (JSON) |
-| POST | `/dashboard/review` | Submit decision on application |
+| GET | `/dashboard` | Dashboard home page |
+| GET | `/dashboard/applications` | Get all applications (JSON) |
+| GET | `/dashboard/application/<app_id>` | Get single application details (JSON) |
+| POST | `/dashboard/review` | Submit credit manager decision |
 | GET | `/dashboard/analytics` | Get dashboard analytics (JSON) |
 
-### Tracking Routes
+### Tracking Routes (Public)
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/track` | Application tracking page |
-| POST | `/verify-tracking` | Verify applicant email |
-| GET | `/track-status/<ref_id>` | Get application status |
+| POST | `/verify-tracking` | Verify applicant email with code |
+| GET | `/track-status/<ref_id>` | Get application status (JSON) |
 
 ### Example: Submit Application
 
-**Request:**
+**cURL Request:**
 ```bash
 curl -X POST http://localhost:5000/submit-application \
   -H "Content-Type: application/x-www-form-urlencoded" \
@@ -459,17 +408,17 @@ curl -X POST http://localhost:5000/submit-application \
   -d "loan_intent=PERSONAL" \
   -d "loan_int_rate=8.5" \
   -d "loan_percent_income=0.33" \
-  -d "credit_history_length=10" \
   -d "credit_score=720" \
+  -d "credit_history_length=10" \
   -d "previous_loan_defaults_on_file=0"
 ```
 
-**Response:**
+**Example Response:**
 ```json
 {
-  "reference_id": "APP123456",
   "status": "success",
-  "prediction": "approved",
+  "reference_id": "APP20260720001",
+  "prediction": "Approved",
   "confidence": 0.87,
   "risk_score": 0.25,
   "risk_category": "Low"
@@ -478,100 +427,97 @@ curl -X POST http://localhost:5000/submit-application \
 
 ---
 
-## 🗄️ Database
+## 🗄️ Database Schema
 
-### Overview
-CreditLens uses **SQLite** for data persistence with **SQLAlchemy ORM** for database operations.
+CreditLens uses SQLite with SQLAlchemy ORM. Auto-created at first run (`instance/CreditLens.db`).
 
-Database file: `instance/CreditLens.db` (auto-created on first run)
+### Core Tables
 
-### Database Schema
-
-#### **users** table
+#### `users`
 Stores user accounts with role-based access:
 
-| Column | Type | Description |
-|--------|------|-------------|
+| Column | Type | Notes |
+|--------|------|-------|
 | id | Integer | Primary Key |
-| name | String | User name |
-| email | String | Email (unique) |
+| name | String | User full name |
+| email | String | Unique email |
 | password | String | Password hash |
-| role | Enum | `credit_manager` or `loan_assistant` |
-| created_at | DateTime | Account creation timestamp |
+| role | String | `credit_manager` or `loan_assistant` |
+| created_at | DateTime | Account creation |
 
-#### **applications** table
-Stores loan applications submitted by assistants:
+#### `applications`
+Loan applications submitted by assistants:
 
-| Column | Type | Description |
-|--------|------|-------------|
+| Column | Type | Notes |
+|--------|------|-------|
 | id | Integer | Primary Key |
-| application_ref | String | Unique reference ID (e.g., APP123456) |
-| loan_assistant_id | Integer | Foreign Key to users |
+| application_ref | String | Unique reference (e.g., APP20260720001) |
+| loan_assistant_id | Integer | FK to users |
 | customer_name | String | Applicant name |
 | customer_email | String | Applicant email |
-| person_age | Integer | Age |
-| person_gender | SmallInt | 0 or 1 (Male/Female) |
+| person_age | Integer | Age in years |
+| person_gender | SmallInt | 0=Female, 1=Male |
 | person_education | String | Education level |
 | person_income | Float | Annual income |
-| person_emp_exp | Integer | Employment experience (years) |
-| person_home_ownership | String | HOME, RENT, OWN, MORTGAGE |
-| loan_amnt | Float | Loan amount requested |
+| person_emp_exp | Integer | Employment years |
+| person_home_ownership | String | OWN, RENT, MORTGAGE, OTHER |
+| loan_amnt | Float | Requested amount |
 | loan_intent | String | Purpose (PERSONAL, EDUCATION, MEDICAL, etc.) |
-| loan_int_rate | Float | Interest rate |
+| loan_int_rate | Float | Interest rate % |
 | loan_percent_income | Float | Loan as % of income |
-| credit_history_length | Float | Credit history duration |
-| credit_score | Integer | Credit score |
-| previous_loan_defaults_on_file | SmallInt | 0 or 1 |
+| credit_history_length | Float | Credit history years |
+| credit_score | Integer | FICO score |
+| previous_loan_defaults_on_file | SmallInt | 0=No, 1=Yes |
 | submitted_at | DateTime | Submission timestamp |
-| tracking_status | String | submitted, underwriting, approved, rejected, etc. |
-| review_queue | String | underwriting, review, hold, etc. |
-| admin_remarks | Text | Reviewer comments |
+| tracking_status | String | submitted, underwriting, approved, rejected, hold |
+| review_queue | String | underwriting, review, hold |
+| admin_remarks | Text | Credit manager comments |
 | status_updated_at | DateTime | Last status update |
 
-#### **predictions** table
-Stores ML model predictions:
+#### `predictions`
+ML model predictions:
 
-| Column | Type | Description |
-|--------|------|-------------|
+| Column | Type | Notes |
+|--------|------|-------|
 | id | Integer | Primary Key |
-| application_id | Integer | Foreign Key to applications |
+| application_id | Integer | FK to applications |
 | ml_decision | SmallInt | 0=Rejected, 1=Approved |
-| confidence_score | Float | Model confidence (0-1) |
-| risk_score | Float | Risk score |
+| confidence_score | Float | 0.0-1.0 model confidence |
+| risk_score | Float | 0.0-1.0 risk level |
 | risk_category | String | Low, Medium, High |
-| flag | Enum | clear or review |
-| final_decision | Enum | approved, rejected, pending, hold |
-| decided_by | Integer | Foreign Key to users (Credit Manager) |
+| flag | String | clear, review |
+| final_decision | String | approved, rejected, pending, hold |
+| decided_by | Integer | FK to users (Credit Manager) |
 | decision_at | DateTime | Decision timestamp |
-| email_sent | SmallInt | 0 or 1 |
+| email_sent | SmallInt | 0=No, 1=Yes |
 | predicted_at | DateTime | Prediction timestamp |
 
-#### **email_verifications** table
-Tracks email verification for tracking portal:
+#### `email_verifications`
+Tracks email verification codes:
 
-| Column | Type | Description |
-|--------|------|-------------|
+| Column | Type | Notes |
+|--------|------|-------|
 | id | Integer | Primary Key |
-| application_id | Integer | Foreign Key to applications |
-| verification_code | String | OTP/Code |
-| expires_at | DateTime | Code expiration time |
+| application_id | Integer | FK to applications |
+| verification_code | String | OTP code |
+| expires_at | DateTime | Code expiration |
 | verified | Boolean | Verification status |
 | attempts | Integer | Verification attempts |
 
-#### **loan_decision_explanations** table
-Stores AI-generated decision explanations:
+#### `loan_decision_explanations`
+AI-generated explanations:
 
-| Column | Type | Description |
-|--------|------|-------------|
+| Column | Type | Notes |
+|--------|------|-------|
 | id | Integer | Primary Key |
-| application_id | Integer | Foreign Key |
-| prediction_id | Integer | Foreign Key |
+| application_id | Integer | FK to applications |
+| prediction_id | Integer | FK to predictions |
 | decision_result | String | approved, rejected, etc. |
-| language_code | String | en, es, etc. |
+| language_code | String | en, es, fr, etc. |
 | provider | String | gemini, huggingface, rule_based |
 | explanation_text | Text | Main explanation |
 | financial_analysis | Text | Financial assessment |
-| suggestions_text | Text | Improvement suggestions |
+| suggestions_text | Text | Improvement recommendations |
 | risk_explanation | Text | Risk analysis |
 | confidence_summary | Text | Confidence statement |
 | smart_tips | Text | Tips for applicant |
@@ -579,20 +525,20 @@ Stores AI-generated decision explanations:
 | email_preview | Text | Email preview |
 | created_at | DateTime | Creation timestamp |
 
-#### **application_timeline_events** table
-Audit log of all application events:
+#### `application_timeline_events`
+Audit log of all events:
 
-| Column | Type | Description |
-|--------|------|-------------|
+| Column | Type | Notes |
+|--------|------|-------|
 | id | Integer | Primary Key |
-| application_id | Integer | Foreign Key |
-| event_key | String | Unique event identifier |
+| application_id | Integer | FK to applications |
+| event_key | String | Unique event ID |
 | title | String | Event title |
 | description | Text | Event details |
-| actor_role | String | Who triggered event (system, manager, assistant) |
+| actor_role | String | system, manager, assistant |
 | created_at | DateTime | Event timestamp |
 
-### Entity Relationships
+### Relationships
 
 ```
 User (1) ──→ (Many) Application
@@ -607,234 +553,331 @@ Application (1) ──→ (Many) ApplicationTimelineEvent
 
 ## 🤖 Machine Learning
 
-### Dataset
-- **File**: `ML/loan_data.csv`
-- **Size**: ~3.6MB with multiple applicant records
-- **Features**: 18 input features (age, income, credit score, loan details, etc.)
-- **Target**: Binary classification (Approved/Rejected)
+### Model Details
 
-### Model
-- **Type**: XGBoost (eXtreme Gradient Boosting)
-- **File**: `ML/model.pkl`
-- **Training**: SMOTE-balanced dataset to handle class imbalance
-- **Serialization**: Joblib pickle format
+- **Type:** XGBoost (eXtreme Gradient Boosting)
+- **Task:** Binary Classification (Approved/Rejected)
+- **File:** `ML/model.pkl` (serialized with Joblib)
+- **Training Data:** `ML/loan_data.csv` (~3.6MB, ~5000+ records)
+- **Features:** 18 numerical and categorical applicant attributes
+- **Balancing:** SMOTE (Synthetic Minority Over-Sampling) to handle class imbalance
 
-### Preprocessing
-- **Scaler**: `ML/scaler.pkl` (StandardScaler from scikit-learn)
-- **Feature Engineering**: Numerical encoding of categorical features
-- **SMOTE**: Synthetic Minority Over-Sampling Technique for balanced training
+### Preprocessing Pipeline
 
-### Training Process
-The model is trained in the Jupyter notebook (`notebooks/training.ipynb`):
-1. Load loan data
-2. Handle missing values
-3. Encode categorical variables (gender, education, home ownership, loan intent)
-4. Apply SMOTE for class balancing
-5. Split into train/test sets
-6. Train XGBoost classifier
-7. Evaluate with accuracy, precision, recall, F1-score
-8. Save model and scaler
+1. **Feature Loading** – Read loan_data.csv
+2. **Categorical Encoding** – Convert gender, education, home ownership, loan intent to numerical
+3. **Scaling** – StandardScaler normalization (saved in `ML/scaler.pkl`)
+4. **SMOTE Balancing** – Address class imbalance in training set
+5. **Train/Test Split** – 80/20 split for model evaluation
 
 ### Prediction Flow
-1. **Input**: Applicant financial and demographic data
-2. **Preprocessing**: Scale features using scaler.pkl
-3. **Model Inference**: XGBoost predicts approval probability
-4. **Post-Processing**: 
-   - Extract confidence score (max probability)
-   - Calculate risk score (1 - confidence for approved, confidence for rejected)
-   - Categorize risk (Low < 0.33, Medium 0.33-0.66, High > 0.66)
-5. **Output**: Prediction (Approved/Rejected), Confidence, Risk Score
 
-### Evaluation Metrics
-- **Accuracy**: Overall correctness
-- **Precision**: True positives / All positives (minimize false approvals)
-- **Recall**: True positives / Actual positives (catch defaults)
-- **F1-Score**: Harmonic mean of precision & recall
-- **ROC-AUC**: Model discrimination ability
+1. **Input** → Applicant financial and demographic data
+2. **Preprocessing** → Apply scaler (ML/scaler.pkl)
+3. **Model Inference** → XGBoost binary classification
+4. **Post-Processing:**
+   - Extract prediction probability (confidence)
+   - Calculate risk score (inverse confidence)
+   - Categorize risk (Low: <0.33, Medium: 0.33-0.66, High: >0.66)
+5. **Output** → `{prediction, confidence, risk_score, risk_category}`
 
 ### Model Retraining
-To retrain the model with new data:
+
+To retrain with new data:
+
 1. Update `ML/loan_data.csv` with new applicant records
 2. Open `notebooks/training.ipynb` in Jupyter
-3. Run all cells to train and save updated model
-4. Restart Flask application to load new model
+3. Run all cells to train and save updated model/scaler
+4. Restart Flask app to load new model
+
+```bash
+jupyter notebook notebooks/training.ipynb
+```
+
+### Evaluation Metrics
+
+The training notebook computes:
+- **Accuracy** – Overall correctness
+- **Precision** – True approvals / All approvals (minimize false positives)
+- **Recall** – True approvals / Actual approvals (catch defaults)
+- **F1-Score** – Harmonic mean of precision & recall
+- **ROC-AUC** – Model discrimination ability
 
 ---
 
-## 🔧 Configuration
+## ⚙️ Configuration
 
-### Application Settings
+### Flask Application Settings
 
-Edit `.flaskenv` for Flask configuration:
+File: `.flaskenv`
+
 ```shell
 FLASK_APP=run.py
-FLASK_ENV=development  # Change to 'production' for deployment
+FLASK_ENV=development  # Use 'production' for deployment
 ```
 
 ### Email Configuration
 
-In `.env`:
+File: `.env`
+
 ```env
-# Gmail Example
+# Gmail with app-specific password
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=465
 EMAIL_USE_SSL=True
 EMAIL_HOST_USER=your-email@gmail.com
-EMAIL_HOST_PASSWORD=your-app-password  # Use app-specific password, not regular password
+EMAIL_HOST_PASSWORD=your-app-password
 
-# Development (saves emails locally if SMTP fails)
+# Development mode (save emails locally)
 EMAIL_DEV_OUTBOX=True
 EMAIL_FALLBACK_TO_OUTBOX=True
 ```
 
-**Generate Gmail App Password**:
-1. Enable 2-Step Verification in Google Account
-2. Go to App Passwords section
-3. Generate app-specific password
-4. Use in `EMAIL_HOST_PASSWORD`
-
 ### AI Provider Configuration
 
+Choose one of these approaches:
+
+**Option 1: Auto-detect (recommended)**
 ```env
-# Option 1: Auto-detect (tries Gemini, falls back to Hugging Face)
 NLP_PROVIDER=auto
+GEMINI_API_KEY=your-key
+HUGGINGFACEHUB_API_TOKEN=your-token
+```
 
-# Option 2: Only use Gemini
+**Option 2: Google Gemini only**
+```env
 NLP_PROVIDER=gemini
-GEMINI_API_KEY=your-api-key
+GEMINI_API_KEY=your-key
 GEMINI_MODEL_NAME=gemini-1.5-flash
+```
 
-# Option 3: Only use Hugging Face
+**Option 3: Hugging Face only**
+```env
 NLP_PROVIDER=huggingface
 HUGGINGFACEHUB_API_TOKEN=your-token
 HF_MODEL_NAME=mistralai/Mistral-7B-Instruct-v0.2
+```
 
-# Option 4: Rule-based only (no external APIs)
+**Option 4: Rule-based only (no external APIs)**
+```env
 NLP_PROVIDER=none
 ```
 
 ### Database Configuration
 
-In `app/__init__.py`:
+Default: SQLite (`sqlite:///CreditLens.db`)
+
+For production with PostgreSQL, edit `app/__init__.py`:
 ```python
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///CreditLens.db"  # SQLite
-# Or use PostgreSQL for production:
-# "postgresql://user:password@localhost/creditlens"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://user:password@localhost:5432/creditlens"
+```
+
+### Application Settings
+
+```env
+DEFAULT_LOAN_TENURE_MONTHS=36        # Default loan term
+MODEL_APPROVAL_CLASS_LABEL=0         # Approval class in model
+PORTAL_LOGIN_URL=http://127.0.0.1:5000/login  # Login URL for emails
+SECRET_KEY=Ex_Tracker                # Flask session key (change in production)
 ```
 
 ---
 
-## 📸 Screenshots
-
-### Home Page
-![Home Page](docs/images/home.png)
-*Application submission interface*
-
-### Prediction Results
-![Prediction Results](docs/images/prediction-results.png)
-*ML decision with AI explanation*
-
-### Admin Dashboard
-![Admin Dashboard](docs/images/admin-dashboard.png)
-*Credit manager review interface*
-
-### Tracking Portal
-![Tracking Portal](docs/images/tracking.png)
-*Applicant status tracking*
-
----
-
-## 🔄 Workflow
-
-CreditLens follows this loan decision workflow:
-
-```mermaid
-flowchart LR
-    A["Applicant"] -->|Fills Form| B["Loan Assistant Portal"]
-    B -->|Submits Application| C["Flask Backend"]
-    C -->|Feature Engineering| D["ML Model XGBoost"]
-    D -->|Prediction| E["Risk Scoring"]
-    E -->|Calculate Metrics| F["Generate Explanation"]
-    F -->|Gemini/HF/Rule-Based| G["Store in Database"]
-    G -->|Email Notification| H["Applicant"]
-    G -->|Queue for Review| I["Credit Manager Dashboard"]
-    I -->|Review & Decide| J["Approve/Reject/Hold"]
-    J -->|Update Status| K["Database"]
-    K -->|Final Email| H
-    H -->|Verify Email| L["Tracking Portal"]
-    L -->|View Status| M["Timeline & Decision"]
-```
-
-### Workflow Steps
-
-1. **Application Submission**
-   - Loan Assistant enters applicant data via web form
-   - Form validation on frontend and backend
-   - Application saved to database with reference ID
-
-2. **ML Prediction**
-   - Feature preprocessing (scaling, encoding)
-   - XGBoost model inference
-   - Confidence score, risk score, and risk category calculated
-
-3. **Explanation Generation**
-   - AI provider (Gemini/Hugging Face) generates explanation
-   - Fallback to rule-based explanations if API fails
-   - Financial analysis and recommendations included
-
-4. **Admin Review**
-   - Application appears in Credit Manager dashboard
-   - Manager reviews ML decision and AI explanation
-   - Manager approves, rejects, or holds application
-   - Optional manager remarks added for audit
-
-5. **Applicant Notification**
-   - Email sent to applicant with decision and explanation
-   - Verification code for tracking portal access
-   - Email includes smart tips for future applications
-
-6. **Tracking**
-   - Applicant verifies email and accesses tracking portal
-   - Views real-time application status
-   - Reviews decision timeline and all event history
-
----
-
-## 🐛 Troubleshooting
+## 🔧 Troubleshooting
 
 ### Issue: "ModuleNotFoundError: No module named 'flask'"
-**Solution**: Ensure virtual environment is activated and requirements installed:
+
+**Solution:** Ensure virtual environment is activated and requirements installed:
 ```bash
 source venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
 ```
 
-### Issue: Database file not found
-**Solution**: Database is auto-created on first run. If missing, reset it:
+### Issue: Database file not found / Login with demo credentials fails
+
+**Solution:** Reset database:
 ```bash
-rm instance/CreditLens.db  # Remove old database
-python -c "from app import create_app; app = create_app()"  # Recreate
+rm instance/CreditLens.db
+python -c "from app import create_app; create_app()"
 ```
 
-### Issue: "ConnectionRefusedError" when sending emails
-**Solution**: Check SMTP configuration in `.env`. For Gmail, ensure:
-- 2-Step Verification is enabled
-- App-specific password is used (not regular Gmail password)
-- `EMAIL_PORT=465` with `EMAIL_USE_SSL=True`
+### Issue: SMTP ConnectionRefusedError when sending emails
+
+**Solution:** Verify email configuration in `.env`:
+- Enable 2-Step Verification in Google Account
+- Generate app-specific password (not regular Gmail password)
+- Use `EMAIL_PORT=465` with `EMAIL_USE_SSL=True`
+
+For testing without SMTP:
+```env
+EMAIL_DEV_OUTBOX=True
+EMAIL_FALLBACK_TO_OUTBOX=True
+```
+
+Emails are saved locally in `instance/mail_outbox/`.
 
 ### Issue: "API key not configured" for Gemini/Hugging Face
-**Solution**: Add API keys to `.env`:
+
+**Solution:** Add API keys to `.env`:
 ```env
 GEMINI_API_KEY=your-key
 HUGGINGFACEHUB_API_TOKEN=your-token
 ```
-Or set `NLP_PROVIDER=none` for rule-based explanations only.
 
-### Issue: Login fails with demo credentials
-**Solution**: Reset database:
+Or disable external APIs:
+```env
+NLP_PROVIDER=none
+```
+
+### Issue: Port 5000 already in use
+
+**Solution:** Run on different port:
 ```bash
-rm instance/CreditLens.db
-python -c "from app import create_app; app = create_app()"
+python -m flask run --port 5001
+```
+
+---
+
+## 📊 Environment Variables Reference
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `SECRET_KEY` | Flask session encryption key | `Ex_Tracker` | No |
+| `FLASK_ENV` | Environment mode | `development` | No |
+| `EMAIL_HOST` | SMTP server | `smtp.gmail.com` | No |
+| `EMAIL_PORT` | SMTP port | `465` | No |
+| `EMAIL_USE_SSL` | Use SSL for SMTP | `True` | No |
+| `EMAIL_HOST_USER` | Sender email account | `` | If sending emails |
+| `EMAIL_HOST_PASSWORD` | Email password/token | `` | If sending emails |
+| `EMAIL_SENDER` | Sender email display | Auto-detected | No |
+| `EMAIL_SENDER_NAME` | Sender name display | `CreditLens Support` | No |
+| `EMAIL_DEV_OUTBOX` | Save emails locally | `True` | No |
+| `EMAIL_FALLBACK_TO_OUTBOX` | Fallback to local save | `True` | No |
+| `SUPPORT_EMAIL` | Support contact email | Auto-detected | No |
+| `SUPPORT_PHONE` | Support phone number | `+91-00000-00000` | No |
+| `SUPPORT_HOURS` | Support hours display | `Mon-Fri, 9:00 AM to 6:00 PM` | No |
+| `PORTAL_LOGIN_URL` | Portal URL in emails | `http://127.0.0.1:5000/login` | No |
+| `DEFAULT_LOAN_TENURE_MONTHS` | Default loan term | `36` | No |
+| `MODEL_APPROVAL_CLASS_LABEL` | Approval class label | `0` | No |
+| `NLP_PROVIDER` | AI provider | `auto` | No |
+| `GEMINI_API_KEY` | Google Gemini API key | `` | If using Gemini |
+| `GEMINI_MODEL_NAME` | Gemini model version | `gemini-1.5-flash` | No |
+| `HUGGINGFACEHUB_API_TOKEN` | Hugging Face API token | `` | If using HF |
+| `HF_MODEL_NAME` | Hugging Face model | `mistralai/Mistral-7B-Instruct-v0.2` | No |
+
+---
+
+## 📦 System Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| **Python** | 3.8 | 3.10+ |
+| **RAM** | 2GB | 4GB+ |
+| **Disk Space** | 500MB | 1GB+ |
+| **OS** | Linux, macOS, Windows | Any |
+
+**Optional:**
+- CUDA/GPU for faster model training
+- PostgreSQL for production database
+
+---
+
+## 🔄 Application Workflow
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 1. LOAN ASSISTANT SUBMITS APPLICATION                      │
+│    - Fills applicant details via web form                  │
+│    - Backend validates and saves to database               │
+│    - Generates unique reference ID                         │
+└────────────────┬────────────────────────────────────────────┘
+                 │
+┌────────────────▼────────────────────────────────────────────┐
+│ 2. ML PREDICTION                                            │
+│    - Preprocesses features (scaling, encoding)             │
+│    - XGBoost model inference                               │
+│    - Calculates confidence & risk scores                   │
+└────────────────┬────────────────────────────────────────────┘
+                 │
+┌────────────────▼────────────────────────────────────────────┐
+│ 3. EXPLANATION GENERATION                                   │
+│    - Calls Gemini or Hugging Face API                      │
+│    - Generates human-readable explanation                  │
+│    - Falls back to rule-based if API fails                 │
+└────────────────┬────────────────────────────────────────────┘
+                 │
+┌────────────────▼────────────────────────────────────────────┐
+│ 4. DATABASE STORAGE                                         │
+│    - Saves application, prediction, explanation            │
+│    - Creates timeline event                                │
+│    - Sends email notification to applicant                 │
+└────────────────┬────────────────────────────────────────────┘
+                 │
+┌────────────────▼────────────────────────────────────────────┐
+│ 5. ADMIN REVIEW (CREDIT MANAGER DASHBOARD)                 │
+│    - Reviews ML decision & AI explanation                  │
+│    - Approves, Rejects, or Holds application              │
+│    - Adds optional remarks                                 │
+└────────────────┬────────────────────────────────────────────┘
+                 │
+┌────────────────▼────────────────────────────────────────────┐
+│ 6. FINAL NOTIFICATION                                       │
+│    - Sends final decision email to applicant               │
+│    - Includes decision, explanation, next steps            │
+│    - Provides tracking portal access                       │
+└────────────────┬────────────────────────────────────────────┘
+                 │
+┌────────────────▼────────────────────────────────────────────┐
+│ 7. APPLICANT TRACKING                                       │
+│    - Applicant verifies email                              │
+│    - Accesses tracking portal                              │
+│    - Views application status & timeline                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🛠️ Development & Deployment
+
+### Development Mode
+
+```bash
+python run.py
+```
+
+Features:
+- Hot reload on code changes
+- Detailed error messages
+- SMTP fallback to local email save
+
+### Production Deployment
+
+#### Using Gunicorn:
+
+```bash
+pip install gunicorn
+gunicorn -w 4 -b 0.0.0.0:8000 run:app
+```
+
+#### Using Docker (optional):
+
+```dockerfile
+FROM python:3.10-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "run:app"]
+```
+
+#### Production .env settings:
+
+```env
+FLASK_ENV=production
+SECRET_KEY=generate-a-random-key
+EMAIL_HOST_USER=your-production-email
+EMAIL_HOST_PASSWORD=your-app-password
+GEMINI_API_KEY=your-production-key
 ```
 
 ---
@@ -852,46 +895,64 @@ python -c "from app import create_app; app = create_app()"
 
 ## 📄 License
 
-This project is open-source. Please check the repository for license details.
-
----
-
-## 👨‍💻 Author
-
-**Praveen Soni**  
-GitHub: [@praveen-soni06](https://github.com/praveen-soni06)
+This project is open-source. No LICENSE file currently exists in the repository. Please add a license (e.g., MIT, Apache 2.0) based on your intended distribution terms.
 
 ---
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps:
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b feature/YourFeature`
+3. **Commit** your changes: `git commit -m 'Add YourFeature'`
+4. **Push** to the branch: `git push origin feature/YourFeature`
+5. **Open** a Pull Request with detailed description
+
+### Development Guidelines
+
+- Use virtual environments for isolation
+- Test all changes before submitting PR
+- Update README if adding new features
+- Follow PEP 8 Python style guide
+- Add docstrings to new functions/classes
 
 ---
 
-## 📞 Support
+## 📞 Support & Issues
 
-For issues, questions, or suggestions:
-1. Check the [Troubleshooting](#-troubleshooting) section
-2. Review existing [GitHub Issues](https://github.com/praveen-soni06/CreditLens--ML-Based-Loan-Analyzer-/issues)
-3. Create a new issue with detailed description
+**For issues, questions, or feature requests:**
+
+1. Check the [Troubleshooting](#-troubleshooting) section above
+2. Search existing [GitHub Issues](https://github.com/praveen-soni06/CreditLens--ML-Based-Loan-Analyzer-/issues)
+3. Create a new issue with:
+   - Clear title and description
+   - Steps to reproduce (if applicable)
+   - Python/Flask/XGBoost versions
+   - Error logs or stack trace
 
 ---
 
 ## ⭐ Acknowledgments
 
-- XGBoost for the powerful ML framework
-- Flask for the lightweight web framework
-- Scikit-Learn for ML utilities
-- Google Gemini and Hugging Face for AI capabilities
-- The open-source community for amazing tools
+- **XGBoost** – Powerful gradient boosting framework
+- **Flask** – Lightweight and flexible web framework
+- **Scikit-Learn** – ML utilities and preprocessing
+- **SQLAlchemy** – Elegant ORM for database operations
+- **Google Gemini & Hugging Face** – AI-powered explanations
+- **Bootstrap** – Responsive UI framework
+- The open-source community for amazing tools and libraries
 
 ---
 
-**Last Updated**: July 2026  
-**Version**: 1.0.0
+## 👨‍💻 Author
+
+**Praveen Soni**  
+GitHub: [@praveen-soni06](https://github.com/praveen-soni06)  
+Repository: [CreditLens--ML-Based-Loan-Analyzer-](https://github.com/praveen-soni06/CreditLens--ML-Based-Loan-Analyzer-)
+
+---
+
+**Last Updated:** July 2026  
+**Version:** 1.0.0  
+**Status:** Active Development
